@@ -63,6 +63,24 @@ This project is a mini app built using the duo server side CodeProject AI server
    python database_setup.py
    ```
 
+### Setting up a Conda Environment
+
+1. Create a conda environment:
+   ```bash
+   conda create --name myenv python=3.8
+   ```
+
+2. Activate the conda environment:
+   ```bash
+   conda activate myenv
+   ```
+
+3. Install the required dependencies using `pip` within the conda environment:
+   ```bash
+   pip install -r server/requirements.txt
+   pip install -r client/requirements.txt
+   ```
+
 ## Usage Instructions
 
 1. Start the CodeProject AI server and MindsDB server as described in the installation instructions.
