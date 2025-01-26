@@ -1,2 +1,1 @@
-# mini-app-codeproject-ai-mindsdb
-A repository for a mini app with CodeProject AI Server and MindsDB
+This repository is empty. Any task executed on it should be considered a new capability and needs to be created.
