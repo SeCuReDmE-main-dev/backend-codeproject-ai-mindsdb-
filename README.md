@@ -1,1 +1,96 @@
-This repository is empty. Any task executed on it should be considered a new capability and needs to be created.
+# Mini App with CodeProject AI Server and MindsDB
+
+## Description
+
+This project is a mini app built using the duo server side CodeProject AI server and MindsDB, with 3 different installations and a shared central database. The app intertwines the capabilities of both tools through their REST APIs to ensure constant communication between the backend and frontend. The app also utilizes persistent outside storage to hold 3 different databases, one for each part, categorized by coding language: Python, JavaScript, and other languages like Make/Go, bakefiles, .yml, .yaml. All parts share the same central database as the output.
+
+## Installation Instructions
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Docker
+- Conda
+
+### Setting up the CodeProject AI Server
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/githubnext/workspace-blank.git
+   cd workspace-blank
+   ```
+
+2. Navigate to the `server` directory:
+   ```bash
+   cd server
+   ```
+
+3. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run the CodeProject AI server:
+   ```bash
+   python codeproject_ai_server.py
+   ```
+
+### Setting up the MindsDB Server
+
+1. Navigate to the `server` directory:
+   ```bash
+   cd server
+   ```
+
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the MindsDB server:
+   ```bash
+   python mindsdb_server.py
+   ```
+
+### Setting up the Shared Central Database
+
+1. Navigate to the `server` directory:
+   ```bash
+   cd server
+   ```
+
+2. Run the database setup script:
+   ```bash
+   python database_setup.py
+   ```
+
+## Usage Instructions
+
+1. Start the CodeProject AI server and MindsDB server as described in the installation instructions.
+
+2. Navigate to the `client` directory:
+   ```bash
+   cd client
+   ```
+
+3. Open `index.html` in a web browser to access the client-side interface.
+
+4. Use the client-side interface to interact with the mini app, which will communicate with the backend servers and the shared central database.
+
+## Contributing Guidelines
+
+We welcome contributions to this project. To contribute, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Make your changes and commit them with a clear message.
+4. Push your changes to your fork.
+5. Create a pull request to the main repository.
+
+## License Information
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
+
+## Contact Information
+
+For any questions or inquiries, please contact us at [email@example.com].
