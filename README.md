@@ -2,15 +2,14 @@
 
 ## Description
 
-This project is a mini app built using the duo server side CodeProject AI server and MindsDB, with 3 different installations and a shared central database. The app intertwines the capabilities of both tools through their REST APIs to ensure constant communication between the backend and frontend. The app also utilizes persistent outside storage to hold 3 different databases, one for each part, categorized by coding language: Python, JavaScript, and other languages like Make/Go, bakefiles, .yml, .yaml. All parts share the same central database as the output.
+This project is a mini app built using the duo server side CodeProject AI server and MindsDB. The app intertwines the capabilities of both tools through their REST APIs to ensure constant communication between the backend and frontend. The app also utilizes persistent outside storage to hold databases categorized by coding language: Python, JavaScript, and other languages like Make/Go, bakefiles, .yml, .yaml.
 
 ## Installation Instructions
 
 ### Prerequisites
 
 - Python 3.8 or higher
-- Docker
-- Conda
+- Flask
 
 ### Setting up the CodeProject AI Server
 
@@ -73,9 +72,14 @@ This project is a mini app built using the duo server side CodeProject AI server
    cd client
    ```
 
-3. Open `index.html` in a web browser to access the client-side interface.
+3. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4. Use the client-side interface to interact with the mini app, which will communicate with the backend servers and the shared central database.
+4. Open `index.html` in a web browser to access the client-side interface.
+
+5. Use the client-side interface to interact with the mini app, which will communicate with the backend servers and the shared central database.
 
 ## Contributing Guidelines
 
