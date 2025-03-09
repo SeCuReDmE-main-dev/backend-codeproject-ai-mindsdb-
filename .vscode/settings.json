@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "base",
+            "group": "ai_configuration",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "Scrde.ca7476"
+        }
+    ]
+}
