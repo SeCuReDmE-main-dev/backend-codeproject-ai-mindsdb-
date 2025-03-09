@@ -4,81 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Adventure for Kids</title>
-    <style>
-        body {
-            font-family: "Comic Sans MS", cursive, sans-serif;
-            background-color: #f0f8ff;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        .header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .activity-card {
-            background-color: #fafafa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-        .activity-card:hover {
-            background-color: #e0f7fa;
-            transform: scale(1.02);
-        }
-        .activity-icon {
-            width: 80px;
-            height: 80px;
-            margin-right: 15px;
-            border-radius: 50%;
-            background-color: #ffeb3b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-        }
-        .activity-text {
-            text-align: left;
-        }
-        .activity-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .activity-description {
-            font-size: 16px;
-            color: #666;
-        }
-        .result-area {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #e8f5e9;
-            min-height: 200px;
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>AI Adventure for Kids!</h1>
             <p>Learn about AI in a fun way!</p>
+        </div>
+        
+        <!-- Human and AI Hub Section -->
+        <div class="hub-container">
+            <div class="hub-section human-hub">
+                <h2 class="hub-title">Human Hub</h2>
+                <div class="hub-content">
+                    <p>Connect with other kids learning about AI!</p>
+                    <span class="badge badge-accent">Interactive</span>
+                    <span class="badge badge-secondary">Collaborative</span>
+                </div>
+            </div>
+            
+            <div class="hub-section ai-hub">
+                <h2 class="hub-title">AI Hub</h2>
+                <div class="hub-content">
+                    <p>Discover the amazing world of artificial intelligence!</p>
+                    <span class="badge badge-primary">Smart</span>
+                    <span class="badge badge-special">Learning</span>
+                </div>
+            </div>
         </div>
         
         <div class="activity-card" onclick="startActivity('animals')">
@@ -110,6 +63,11 @@
             <div id="activityContent">
                 <!-- Results will be displayed here -->
             </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 SeCuReDmE - Your AI Adventure Companion</p>
+            <p><a href="#" class="special">Privacy Policy</a> | <a href="#" class="special">Contact Us</a></p>
         </div>
     </div>
 
@@ -303,10 +261,10 @@
                             <h3>The Space Explorer</h3>
                             <p>Once upon a time, there was a brave astronaut named Alex. Alex always dreamed of exploring the stars!</p>
                             <p>One day, Alex got into a shiny spaceship and blasted off into space. "Wow!" said Alex, looking at the Earth below.</p>
-                            <p>During the journey, Alex met a friendly alien named Blip. Blip had purple skin and three eyes!</p>
+                            <p>During the journey, Alex met a friendly alien named Blip. Blip had <span class="special">purple skin</span> and three eyes!</p>
                             <p>"Would you like to see my planet?" asked Blip.</p>
                             <p>"Yes, please!" said Alex with excitement.</p>
-                            <p>They flew to Blip's planet, which had rings like Saturn and was full of colorful creatures. Alex learned many new things about space and made a great friend!</p>
+                            <p>They flew to Blip's planet, which had rings like Saturn and was full of <span class="highlight">colorful creatures</span>. Alex learned many new things about space and made a great friend!</p>
                             <p>The End</p>
                         `;
                         break;
@@ -315,9 +273,9 @@
                             <h3>Jungle Adventure</h3>
                             <p>Maya was a curious explorer who loved to discover new places. One day, she decided to explore the wild jungle!</p>
                             <p>As Maya walked through the jungle, she saw tall trees reaching up to the sky and heard birds singing beautiful songs.</p>
-                            <p>Suddenly, she met a friendly monkey named Coco. "Hello there!" said Coco, swinging from a vine.</p>
+                            <p>Suddenly, she met a friendly monkey named Coco. <span class="emphasis">"Hello there!"</span> said Coco, swinging from a vine.</p>
                             <p>"Hi Coco! Can you show me around?" asked Maya.</p>
-                            <p>"Follow me!" said Coco, leading Maya to a magnificent waterfall hidden in the jungle.</p>
+                            <p><span class="emphasis">"Follow me!"</span> said Coco, leading Maya to a magnificent waterfall hidden in the jungle.</p>
                             <p>They had a wonderful time exploring together, and Maya learned all about the amazing plants and animals that live in the jungle.</p>
                             <p>The End</p>
                         `;
@@ -325,10 +283,10 @@
                     case 'underwater':
                         story = `
                             <h3>Deep Sea Discovery</h3>
-                            <p>Sam loved the ocean and always wondered what was deep under the waves. One day, Sam found a magical shell on the beach.</p>
+                            <p>Sam loved the ocean and always wondered what was deep under the waves. One day, Sam found a <span class="highlight">magical shell</span> on the beach.</p>
                             <p>When Sam picked up the shell, something amazing happened! Sam could suddenly breathe underwater!</p>
-                            <p>Sam dove into the ocean and discovered a colorful coral reef with fish of every color swimming around.</p>
-                            <p>A friendly dolphin named Splash appeared. "Would you like a tour of my home?" asked Splash.</p>
+                            <p>Sam dove into the ocean and discovered a <span class="special">colorful coral reef</span> with fish of every color swimming around.</p>
+                            <p>A friendly dolphin named Splash appeared. <span class="emphasis">"Would you like a tour of my home?"</span> asked Splash.</p>
                             <p>"Yes, that would be amazing!" said Sam.</p>
                             <p>Splash showed Sam all the wonders of the ocean - from tiny seahorses to a giant, gentle whale. It was the best adventure ever!</p>
                             <p>The End</p>
@@ -352,7 +310,7 @@
             const storyOutput = document.getElementById('storyOutput');
             if (liked) {
                 storyOutput.innerHTML += `
-                    <div style="color: green; margin-top: 10px;">
+                    <div class="highlight" style="margin-top: 10px;">
                         <p>I'm glad you liked the story! 😊</p>
                     </div>
                 `;
