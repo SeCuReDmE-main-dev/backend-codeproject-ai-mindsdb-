@@ -1,0 +1,43 @@
+{
+  "project": {
+    "name": "SeCuReDmE Core AI",
+    "version": "1.0.0"
+  },
+  "servers": {
+    "codeproject_ai": {
+      "host": "localhost",
+      "port": 32168,
+      "api_path": "v1"
+    },
+    "mindsdb": {
+      "host": "localhost",
+      "port": 47334,
+      "api_path": "api/sql/query"
+    }
+  },
+  "modules": {
+    "SentimentAnalysis": {
+      "enabled": true,
+      "description": "Sentiment analysis using multiple AI backends",
+      "path": "CodeProject.AI-Modules/CodeProject.AI-SentimentAnalysis",
+      "dependencies": ["codeproject_ai", "mindsdb"]
+    },
+    "PortraitFilter": {
+      "enabled": true,
+      "description": "Image processing and facial detection",
+      "path": "CodeProject.AI-Modules/CodeProject.AI-PortraitFilter",
+      "dependencies": ["codeproject_ai"]
+    }
+  },
+  "models": {
+    "sentiment_model": {
+      "type": "mindsdb",
+      "description": "Sentiment analysis model",
+      "setup_query": "CREATE MODEL sentiment_model PREDICT sentiment USING ENGINE = 'openai', PREDICT_PARAMS = {\"model_name\": \"gpt-3.5-turbo\"}"
+    }
+  },
+  "security": {
+    "enabled": false,
+    "api_keys": {}
+  }
+}
