@@ -8,6 +8,7 @@
     "build:incredibuild": "build-with-incredibuild.bat"
   },
   "dependencies": {
+    "discord.js": "^14.18.0",
     "express": "^4.17.1"
   }
 }
