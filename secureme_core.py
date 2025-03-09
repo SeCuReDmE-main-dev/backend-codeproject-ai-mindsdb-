@@ -313,10 +313,9 @@ namespace {module_name}
         main_file = full_path / f"{module_name}.py"
         with open(main_file, 'w') as f:
             f.write(f"""#!/usr/bin/env python
-"""\"
-{module_name} - A SeCuReDmE AI Module
+\"\"\"{module_name} - A SeCuReDmE AI Module
 This module connects to the CodeProject AI Server and MindsDB.
-\"""\"
+\"\"\"
 
 import os
 import sys
