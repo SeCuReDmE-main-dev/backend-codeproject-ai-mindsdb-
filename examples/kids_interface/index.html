@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Adventure for Kids</title>
+    <style>
+        body {
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .activity-card {
+            background-color: #fafafa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        .activity-card:hover {
+            background-color: #e0f7fa;
+            transform: scale(1.02);
+        }
+        .activity-icon {
+            width: 80px;
+            height: 80px;
+            margin-right: 15px;
+            border-radius: 50%;
+            background-color: #ffeb3b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+        }
+        .activity-text {
+            text-align: left;
+        }
+        .activity-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .activity-description {
+            font-size: 16px;
+            color: #666;
+        }
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #e8f5e9;
+            min-height: 200px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Adventure for Kids!</h1>
+            <p>Learn about AI in a fun way!</p>
+        </div>
+        
+        <div class="activity-card" onclick="startActivity('animals')">
+            <div class="activity-icon">🦁</div>
+            <div class="activity-text">
+                <div class="activity-title">Animal Friends</div>
+                <div class="activity-description">Let's learn about different animals with AI!</div>
+            </div>
+        </div>
+        
+        <div class="activity-card" onclick="startActivity('math')">
+            <div class="activity-icon">➗</div>
+            <div class="activity-text">
+                <div class="activity-title">Math Helper</div>
+                <div class="activity-description">Get help with your math problems!</div>
+            </div>
+        </div>
+        
+        <div class="activity-card" onclick="startActivity('story')">
+            <div class="activity-icon">📚</div>
+            <div class="activity-text">
+                <div class="activity-title">Story Time</div>
+                <div class="activity-description">Create amazing stories with AI!</div>
+            </div>
+        </div>
+        
+        <div class="result-area" id="resultArea">
+            <h2 id="activityTitle">Activity Results</h2>
+            <div id="activityContent">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startActivity(type) {
+            const resultArea = document.getElementById('resultArea');
+            const activityTitle = document.getElementById('activityTitle');
+            const activityContent = document.getElementById('activityContent');
+            
+            resultArea.style.display = 'block';
+            
+            // Show loading animation
+            activityContent.innerHTML = '<p>Loading your AI adventure...</p><div class="loader"></div>';
+            
+            // In a real app, this would call your Python backend
+            // For demo purposes, we'll simulate responses
+            setTimeout(() => {
+                let title, content;
+                
+                switch(type) {
+                    case 'animals':
+                        title = 'Animal Friends';
+                        content = `
+                            <p>What animal would you like to learn about?</p>
+                            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                                <button onclick="showAnimalInfo('elephant')">Elephant</button>
+                                <button onclick="showAnimalInfo('lion')">Lion</button>
+                                <button onclick="showAnimalInfo('giraffe')">Giraffe</button>
+                            </div>
+                            <div id="animalInfo" style="margin-top: 20px;"></div>
+                        `;
+                        break;
+                    case 'math':
+                        title = 'Math Helper';
+                        content = `
+                            <p>What kind of math problem do you need help with?</p>
+                            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px; margin: 15px auto;">
+                                <button onclick="showMathHelp('addition')">Addition</button>
+                                <button onclick="showMathHelp('subtraction')">Subtraction</button>
+                                <button onclick="showMathHelp('multiplication')">Multiplication</button>
+                            </div>
+                            <div id="mathHelp" style="margin-top: 20px;"></div>
+                        `;
+                        break;
+                    case 'story':
+                        title = 'Story Time';
+                        content = `
+                            <p>Let's create a fun story together!</p>
+                            <p>Choose a story theme:</p>
+                            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                                <button onclick="generateStory('space')">Space Adventure</button>
+                                <button onclick="generateStory('jungle')">Jungle Exploration</button>
+                                <button onclick="generateStory('underwater')">Ocean Discovery</button>
+                            </div>
+                            <div id="storyOutput" style="margin-top: 20px; text-align: left;"></div>
+                        `;
+                        break;
+                }
+                
+                activityTitle.textContent = title;
+                activityContent.innerHTML = content;
+                
+            }, 1500);
+        }
+        
+        function showAnimalInfo(animal) {
+            const animalInfo = document.getElementById('animalInfo');
+            let info = '';
+            
+            switch(animal) {
+                case 'elephant':
+                    info = `
+                        <h3>Elephants</h3>
+                        <p>Elephants are the largest land animals on Earth! They have big ears, long trunks, and are very smart.</p>
+                        <p>Did you know elephants can use their trunk to pick up small objects?</p>
+                    `;
+                    break;
+                case 'lion':
+                    info = `
+                        <h3>Lions</h3>
+                        <p>Lions are known as the "King of the Jungle". Male lions have a big mane around their head.</p>
+                        <p>Did you know lions can sleep up to 20 hours per day?</p>
+                    `;
+                    break;
+                case 'giraffe':
+                    info = `
+                        <h3>Giraffes</h3>
+                        <p>Giraffes are the tallest animals in the world! They have very long necks and legs.</p>
+                        <p>Did you know giraffes only need to drink water once every few days?</p>
+                    `;
+                    break;
+            }
+            
+            animalInfo.innerHTML = info;
+        }
+        
+        function showMathHelp(topic) {
+            const mathHelp = document.getElementById('mathHelp');
+            let content = '';
+            
+            switch(topic) {
+                case 'addition':
+                    content = `
+                        <h3>Addition Help</h3>
+                        <p>Addition means putting things together! Let's practice:</p>
+                        <div style="margin: 15px 0;">
+                            <p>2 + 3 = ?</p>
+                            <button onclick="checkMathAnswer('addition', 5)">5</button>
+                            <button onclick="checkMathAnswer('addition', 4)">4</button>
+                            <button onclick="checkMathAnswer('addition', 6)">6</button>
+                        </div>
+                    `;
+                    break;
+                case 'subtraction':
+                    content = `
+                        <h3>Subtraction Help</h3>
+                        <p>Subtraction is about taking away! Let's try one:</p>
+                        <div style="margin: 15px 0;">
+                            <p>7 - 4 = ?</p>
+                            <button onclick="checkMathAnswer('subtraction', 2)">2</button>
+                            <button onclick="checkMathAnswer('subtraction', 3)">3</button>
+                            <button onclick="checkMathAnswer('subtraction', 4)">4</button>
+                        </div>
+                    `;
+                    break;
+                case 'multiplication':
+                    content = `
+                        <h3>Multiplication Help</h3>
+                        <p>Multiplication is like adding the same number many times!</p>
+                        <div style="margin: 15px 0;">
+                            <p>3 × 2 = ?</p>
+                            <button onclick="checkMathAnswer('multiplication', 5)">5</button>
+                            <button onclick="checkMathAnswer('multiplication', 6)">6</button>
+                            <button onclick="checkMathAnswer('multiplication', 7)">7</button>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            mathHelp.innerHTML = content;
+        }
+        
+        function checkMathAnswer(topic, answer) {
+            const mathHelp = document.getElementById('mathHelp');
+            let isCorrect = false;
+            let correctAnswer = 0;
+            
+            switch(topic) {
+                case 'addition':
+                    correctAnswer = 5;
+                    isCorrect = answer === correctAnswer;
+                    break;
+                case 'subtraction':
+                    correctAnswer = 3;
+                    isCorrect = answer === correctAnswer;
+                    break;
+                case 'multiplication':
+                    correctAnswer = 6;
+                    isCorrect = answer === correctAnswer;
+                    break;
+            }
+            
+            if (isCorrect) {
+                mathHelp.innerHTML += `
+                    <div style="color: green; margin-top: 10px;">
+                        <p>That's right! Great job! 🎉</p>
+                        <button onclick="showMathHelp('${topic}')">Try another one</button>
+                    </div>
+                `;
+            } else {
+                mathHelp.innerHTML += `
+                    <div style="color: red; margin-top: 10px;">
+                        <p>Not quite! The answer is ${correctAnswer}. Let's try again!</p>
+                        <button onclick="showMathHelp('${topic}')">Try again</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function generateStory(theme) {
+            const storyOutput = document.getElementById('storyOutput');
+            storyOutput.innerHTML = '<p>Creating your story...</p>';
+            
+            // Simulate AI story generation
+            setTimeout(() => {
+                let story = '';
+                
+                switch(theme) {
+                    case 'space':
+                        story = `
+                            <h3>The Space Explorer</h3>
+                            <p>Once upon a time, there was a brave astronaut named Alex. Alex always dreamed of exploring the stars!</p>
+                            <p>One day, Alex got into a shiny spaceship and blasted off into space. "Wow!" said Alex, looking at the Earth below.</p>
+                            <p>During the journey, Alex met a friendly alien named Blip. Blip had purple skin and three eyes!</p>
+                            <p>"Would you like to see my planet?" asked Blip.</p>
+                            <p>"Yes, please!" said Alex with excitement.</p>
+                            <p>They flew to Blip's planet, which had rings like Saturn and was full of colorful creatures. Alex learned many new things about space and made a great friend!</p>
+                            <p>The End</p>
+                        `;
+                        break;
+                    case 'jungle':
+                        story = `
+                            <h3>Jungle Adventure</h3>
+                            <p>Maya was a curious explorer who loved to discover new places. One day, she decided to explore the wild jungle!</p>
+                            <p>As Maya walked through the jungle, she saw tall trees reaching up to the sky and heard birds singing beautiful songs.</p>
+                            <p>Suddenly, she met a friendly monkey named Coco. "Hello there!" said Coco, swinging from a vine.</p>
+                            <p>"Hi Coco! Can you show me around?" asked Maya.</p>
+                            <p>"Follow me!" said Coco, leading Maya to a magnificent waterfall hidden in the jungle.</p>
+                            <p>They had a wonderful time exploring together, and Maya learned all about the amazing plants and animals that live in the jungle.</p>
+                            <p>The End</p>
+                        `;
+                        break;
+                    case 'underwater':
+                        story = `
+                            <h3>Deep Sea Discovery</h3>
+                            <p>Sam loved the ocean and always wondered what was deep under the waves. One day, Sam found a magical shell on the beach.</p>
+                            <p>When Sam picked up the shell, something amazing happened! Sam could suddenly breathe underwater!</p>
+                            <p>Sam dove into the ocean and discovered a colorful coral reef with fish of every color swimming around.</p>
+                            <p>A friendly dolphin named Splash appeared. "Would you like a tour of my home?" asked Splash.</p>
+                            <p>"Yes, that would be amazing!" said Sam.</p>
+                            <p>Splash showed Sam all the wonders of the ocean - from tiny seahorses to a giant, gentle whale. It was the best adventure ever!</p>
+                            <p>The End</p>
+                        `;
+                        break;
+                }
+                
+                storyOutput.innerHTML = story;
+                storyOutput.innerHTML += `
+                    <div style="margin-top: 20px;">
+                        <p>Did you like that story?</p>
+                        <button onclick="rateStory(true)">Yes!</button>
+                        <button onclick="generateStory('${theme}')">Try another one</button>
+                    </div>
+                `;
+                
+            }, 2000);
+        }
+        
+        function rateStory(liked) {
+            const storyOutput = document.getElementById('storyOutput');
+            if (liked) {
+                storyOutput.innerHTML += `
+                    <div style="color: green; margin-top: 10px;">
+                        <p>I'm glad you liked the story! 😊</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
