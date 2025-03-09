@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BuildConsole>
+  <Profile>
+    <ProfileName>CodeProject AI-MindsDB Build</ProfileName>
+    <MaxCores>0</MaxCores>
+    <MaxCoresLocal>0</MaxCoresLocal>
+    <AvoidLocalExecution>false</AvoidLocalExecution>
+    <CopyFilesToCoordinator>false</CopyFilesToCoordinator>
+    <CopyFilesFromCoordinator>false</CopyFilesFromCoordinator>
+    <AvoidNetworkAccess>false</AvoidNetworkAccess>
+    <Environment>
+      <Variable Name="PATH" Value="%PATH%" />
+    </Environment>
+  </Profile>
+</BuildConsole>
