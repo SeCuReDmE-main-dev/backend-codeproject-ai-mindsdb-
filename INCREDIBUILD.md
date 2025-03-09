@@ -56,6 +56,7 @@ If you see an error like `npm error code EJSONPARSE`, it means your package.json
 
 #### 2. Missing Project Files
 The build script automatically checks for and creates missing project files:
+
 - SentimentAnalysis.csproj
 - PortraitFilter.csproj
 - JsonAPI.csproj
