@@ -3,8 +3,8 @@ echo Starting build process...
 
 :: Create required directories if they don't exist
 echo Creating required directories if they don't exist...
-set "BASE_DIR=D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb"
-set "MODULE_DIR=%BASE_DIR%\CodeProject.AI-Modules"
+set "BASE_DIR=%~dp0"
+set "MODULE_DIR=%BASE_DIR%CodeProject.AI-Modules"
 
 :: Create module directory if it doesn't exist
 if not exist "%MODULE_DIR%" (
@@ -20,6 +20,7 @@ if not exist "%MODULE_DIR%" (
 :: Create SentimentAnalysis directory and project file
 echo Creating SentimentAnalysis directory and project...
 if not exist "%MODULE_DIR%\CodeProject.AI-SentimentAnalysis" (
+    echo Creating directory: "%MODULE_DIR%\CodeProject.AI-SentimentAnalysis"
     mkdir "%MODULE_DIR%\CodeProject.AI-SentimentAnalysis" 2>nul
     if %ERRORLEVEL% neq 0 (
         echo Failed to create SentimentAnalysis directory. Please check permissions.
@@ -29,6 +30,8 @@ if not exist "%MODULE_DIR%\CodeProject.AI-SentimentAnalysis" (
 )
 
 echo Creating SentimentAnalysis project file...
+set "SENTIMENT_PROJ_PATH=%MODULE_DIR%\CodeProject.AI-SentimentAnalysis\SentimentAnalysis.csproj"
+echo Writing to: %SENTIMENT_PROJ_PATH%
 (
     echo ^<Project Sdk="Microsoft.NET.Sdk"^>
     echo   ^<PropertyGroup^>
@@ -37,7 +40,7 @@ echo Creating SentimentAnalysis project file...
     echo     ^<Nullable^>enable^</Nullable^>
     echo   ^</PropertyGroup^>
     echo ^</Project^>
-) > "%MODULE_DIR%\CodeProject.AI-SentimentAnalysis\SentimentAnalysis.csproj" 2>nul
+) > "%SENTIMENT_PROJ_PATH%" 2>nul
 if %ERRORLEVEL% neq 0 (
     echo Failed to create SentimentAnalysis project file. Please check permissions.
     pause > nul
