@@ -1,0 +1,5 @@
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.GeneratedMSBuildEditorConfig.editorconfig
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.AssemblyInfoInputs.cache
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.AssemblyInfo.cs
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.csproj.CoreCompileInputs.cache
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.sourcelink.json

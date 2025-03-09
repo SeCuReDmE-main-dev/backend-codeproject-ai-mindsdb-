@@ -1,0 +1,5 @@
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter\obj\Debug\net6.0\PortraitFilter.GeneratedMSBuildEditorConfig.editorconfig
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter\obj\Debug\net6.0\PortraitFilter.AssemblyInfoInputs.cache
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter\obj\Debug\net6.0\PortraitFilter.AssemblyInfo.cs
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter\obj\Debug\net6.0\PortraitFilter.csproj.CoreCompileInputs.cache
+D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter\obj\Debug\net6.0\PortraitFilter.sourcelink.json
