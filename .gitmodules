@@ -1,0 +1,9 @@
+[submodule "CodeProject.AI-Server"]
+	path = CodeProject.AI-Server
+	url = https://github.com/Celebrum/CodeProject.AI-Server.git
+[submodule "MindsDB"]
+	path = MindsDB
+	url = https://github.com/Celebrum/MindsDB.git
+[submodule "mindsdb-dashboard"]
+	path = mindsdb-dashboard
+	url = https://github.com/Celebrum/mindsdb-dashboard.git
