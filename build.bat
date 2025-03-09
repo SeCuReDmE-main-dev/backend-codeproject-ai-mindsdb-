@@ -6,8 +6,23 @@ echo Creating required directories if they don't exist...
 set "BASE_DIR=%~dp0"
 set "MODULE_DIR=%BASE_DIR%CodeProject.AI-Modules"
 
-:: Create module directory if it doesn't exist
-if not exist "%MODULE_DIR%" (
+:: Check if CodeProject.AI-Modules exists but is a file instead of directory
+if exist "%MODULE_DIR%" (
+    echo Checking if CodeProject.AI-Modules is a directory...
+    for %%I in ("%MODULE_DIR%") do set ATTRIB=%%~aI
+    echo Attributes: %ATTRIB%
+    if not "%ATTRIB:~0,1%"=="d" (
+        echo WARNING: CodeProject.AI-Modules exists but is not a directory.
+        echo Renaming existing file and creating directory...
+        move "%MODULE_DIR%" "%MODULE_DIR%.bak"
+        mkdir "%MODULE_DIR%" 2>nul
+        if %ERRORLEVEL% neq 0 (
+            echo Failed to create module directory. Please check permissions.
+            pause > nul
+            exit /b 1
+        )
+    )
+) else (
     echo Creating CodeProject.AI-Modules directory...
     mkdir "%MODULE_DIR%" 2>nul
     if %ERRORLEVEL% neq 0 (
@@ -36,6 +51,7 @@ echo Writing to: %SENTIMENT_PROJ_PATH%
     echo ^<Project Sdk="Microsoft.NET.Sdk"^>
     echo   ^<PropertyGroup^>
     echo     ^<TargetFramework^>net6.0^</TargetFramework^>
+    echo     ^<OutputType^>Exe^</OutputType^>
     echo     ^<ImplicitUsings^>enable^</ImplicitUsings^>
     echo     ^<Nullable^>enable^</Nullable^>
     echo   ^</PropertyGroup^>
@@ -63,6 +79,7 @@ echo Creating PortraitFilter project file...
     echo ^<Project Sdk="Microsoft.NET.Sdk"^>
     echo   ^<PropertyGroup^>
     echo     ^<TargetFramework^>net6.0^</TargetFramework^>
+    echo     ^<OutputType^>Exe^</OutputType^>
     echo     ^<ImplicitUsings^>enable^</ImplicitUsings^>
     echo     ^<Nullable^>enable^</Nullable^>
     echo   ^</PropertyGroup^>
