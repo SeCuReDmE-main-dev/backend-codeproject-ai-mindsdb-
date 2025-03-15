@@ -20,6 +20,7 @@ echo .NET SDK found.
 set "ROOT_DIR=c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1"
 set "BASE_DIR=%~dp0"
 set "SERVER_DIR=%ROOT_DIR%\CodeProject.AI-Server"
+set "SERVER_SRC=%SERVER_DIR%\src\server"
 set "MINDSDB_DIR=%BASE_DIR%\MindsDB"
 set "MODULES_DIR=%ROOT_DIR%\CodeProject.AI-Modules"
 set "SENTIMENT_MODULE=%MODULES_DIR%\CodeProject.AI-SentimentAnalysis"
@@ -58,7 +59,7 @@ if %ERRORLEVEL% EQU 9 goto end
 :start_codeproject
 echo.
 echo Starting CodeProject AI Server...
-start cmd /k "cd /d %SERVER_DIR% && python src/server/server.py"
+start cmd /k "cd /d %SERVER_SRC% && dotnet run"
 goto end
 
 :start_mindsdb
@@ -103,7 +104,7 @@ echo.
 echo Starting the full integration...
 echo.
 echo 1. Starting CodeProject AI Server...
-start cmd /k "cd /d %SERVER_DIR% && python src/server/server.py"
+start cmd /k "cd /d %SERVER_SRC% && dotnet run"
 timeout /t 5 >nul
 
 echo 2. Starting MindsDB Server...
