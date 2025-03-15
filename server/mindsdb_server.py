@@ -3,9 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from sqlalchemy.exc import SQLAlchemyError
 from functools import wraps
+import json
+import mindsdb_sdk
+from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mindsdb_server.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shared_central_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -22,10 +25,13 @@ def handle_errors(f):
     return wrapper
 
 class Model(db.Model):
+    __tablename__ = 'ai_models'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     status = db.Column(db.String(20), default='pending')
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     predictions = db.relationship('Prediction', backref='model', lazy=True)
 
     def to_dict(self):
@@ -33,23 +39,26 @@ class Model(db.Model):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'status': self.status
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
 
 class Prediction(db.Model):
+    __tablename__ = 'predictions'
     id = db.Column(db.Integer, primary_key=True)
-    model_id = db.Column(db.Integer, db.ForeignKey('model.id'), nullable=False)
-    input_data = db.Column(db.JSON, nullable=False)
-    output_data = db.Column(db.JSON, nullable=False)
+    model_id = db.Column(db.Integer, db.ForeignKey('ai_models.id'), nullable=False)
+    input_data = db.Column(db.Text, nullable=False)
+    output_data = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, server_default=db.func.now())
 
     def to_dict(self):
         return {
             'id': self.id,
             'model_id': self.model_id,
-            'input_data': self.input_data,
-            'output_data': self.output_data,
-            'timestamp': self.timestamp.isoformat()
+            'input_data': json.loads(self.input_data),
+            'output_data': json.loads(self.output_data),
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None
         }
 
 @app.route('/health')
@@ -94,7 +103,10 @@ def update_model(model_id):
         model.name = data['name']
     if 'description' in data:
         model.description = data['description']
+    if 'status' in data:
+        model.status = data['status']
         
+    model.updated_at = datetime.utcnow()
     db.session.commit()
     return jsonify({'message': 'Model updated successfully', 'model': model.to_dict()})
 
@@ -114,25 +126,38 @@ def make_prediction(model_id):
     
     if not data or 'input_data' not in data:
         return jsonify({'error': 'Missing input_data'}), 400
+    
+    try:
+        # Initialize MindsDB connection
+        server = mindsdb_sdk.connect()
         
-    # Here you would integrate with MindsDB for actual predictions
-    # For now, we'll just store a dummy prediction
-    prediction = Prediction(
-        model_id=model.id,
-        input_data=data['input_data'],
-        output_data={'prediction': 'dummy_output'}
-    )
-    
-    db.session.add(prediction)
-    db.session.commit()
-    
-    return jsonify({
-        'message': 'Prediction made successfully',
-        'prediction': prediction.to_dict()
-    }), 201
+        # Get the project and model
+        project = server.get_project('mindsdb')
+        mindsdb_model = project.get_model(model.name)
+        
+        # Make prediction using MindsDB
+        prediction_result = mindsdb_model.predict(data['input_data'])
+        
+        # Store prediction in database
+        prediction = Prediction(
+            model_id=model.id,
+            input_data=json.dumps(data['input_data']),
+            output_data=json.dumps(prediction_result)
+        )
+        
+        db.session.add(prediction)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Prediction made successfully',
+            'prediction': prediction.to_dict()
+        }), 201
+        
+    except Exception as e:
+        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 if __name__ == '__main__':
     with app.app_context():
-        if not os.path.exists('mindsdb_server.db'):
+        if not os.path.exists('shared_central_database.db'):
             db.create_all()
         app.run(host='0.0.0.0', port=5002)
