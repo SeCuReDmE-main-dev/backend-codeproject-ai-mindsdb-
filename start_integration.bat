@@ -21,8 +21,8 @@ set "BASE_DIR=%~dp0"
 set "ROOT_DIR=c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1"
 set "SERVER_DIR=%ROOT_DIR%\CodeProject.AI-Server"
 set "MINDSDB_DIR=%BASE_DIR%\MindsDB"
-set "SENTIMENT_MODULE=%ROOT_DIR%\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis"
-set "PORTRAIT_MODULE=%ROOT_DIR%\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter"
+set "SENTIMENT_MODULE=%BASE_DIR%\CodeProject.AI-Modules.bak\CodeProject.AI-SentimentAnalysis"
+set "PORTRAIT_MODULE=%BASE_DIR%\CodeProject.AI-Modules.bak\CodeProject.AI-PortraitFilter"
 set "MULTIMODELLM_MODULE=%ROOT_DIR%\CodeProject.AI-MultiModeLLM"
 
 echo.
