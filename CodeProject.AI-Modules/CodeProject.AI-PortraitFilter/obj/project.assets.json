@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\CodeProject SeCuReDmE_server\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-PortraitFilter\\PortraitFilter.csproj",
+      "projectUniqueName": "C:\\Users\\jeans\\OneDrive\\Desktop\\SeCuReDmE final\\SeCuReDmE-1\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-PortraitFilter\\PortraitFilter.csproj",
       "projectName": "PortraitFilter",
-      "projectPath": "D:\\CodeProject SeCuReDmE_server\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-PortraitFilter\\PortraitFilter.csproj",
+      "projectPath": "C:\\Users\\jeans\\OneDrive\\Desktop\\SeCuReDmE final\\SeCuReDmE-1\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-PortraitFilter\\PortraitFilter.csproj",
       "packagesPath": "C:\\Users\\jeans\\.nuget\\packages\\",
-      "outputPath": "D:\\CodeProject SeCuReDmE_server\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-PortraitFilter\\obj\\",
+      "outputPath": "C:\\Users\\jeans\\OneDrive\\Desktop\\SeCuReDmE final\\SeCuReDmE-1\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-PortraitFilter\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -87,7 +87,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

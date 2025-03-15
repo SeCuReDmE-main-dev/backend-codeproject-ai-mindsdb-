@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YavYaV7BvzQ=",
+  "dgSpecHash": "7/CjBrtEaKU=",
   "success": true,
-  "projectFilePath": "D:\\CodeProject SeCuReDmE_server\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-SentimentAnalysis\\SentimentAnalysis.csproj",
+  "projectFilePath": "C:\\Users\\jeans\\OneDrive\\Desktop\\SeCuReDmE final\\SeCuReDmE-1\\mini-app-codeproject-ai-mindsdb\\CodeProject.AI-Modules\\CodeProject.AI-SentimentAnalysis\\SentimentAnalysis.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jeans\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
     "C:\\Users\\jeans\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
