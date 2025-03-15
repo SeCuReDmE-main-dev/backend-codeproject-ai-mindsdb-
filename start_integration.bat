@@ -18,11 +18,12 @@ echo .NET SDK found.
 
 :: Set paths
 set "BASE_DIR=%~dp0"
-set "SERVER_DIR=%BASE_DIR%\CodeProject.AI-Server"
+set "ROOT_DIR=c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1"
+set "SERVER_DIR=%ROOT_DIR%\CodeProject.AI-Server"
 set "MINDSDB_DIR=%BASE_DIR%\MindsDB"
-set "SENTIMENT_MODULE=%BASE_DIR%\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis"
-set "PORTRAIT_MODULE=%BASE_DIR%\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter"
-set "MULTIMODELLM_MODULE=%BASE_DIR%\CodeProject.AI-Modules\CodeProject.AI-MultiModeLLM"
+set "SENTIMENT_MODULE=%ROOT_DIR%\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis"
+set "PORTRAIT_MODULE=%ROOT_DIR%\CodeProject.AI-Modules\CodeProject.AI-PortraitFilter"
+set "MULTIMODELLM_MODULE=%ROOT_DIR%\CodeProject.AI-MultiModeLLM"
 
 echo.
 echo ===============================================
