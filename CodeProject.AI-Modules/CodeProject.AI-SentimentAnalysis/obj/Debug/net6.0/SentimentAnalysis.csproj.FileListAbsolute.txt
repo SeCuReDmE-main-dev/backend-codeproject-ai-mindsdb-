@@ -3,3 +3,15 @@ D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-M
 D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.AssemblyInfo.cs
 D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.csproj.CoreCompileInputs.cache
 D:\CodeProject SeCuReDmE_server\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.sourcelink.json
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\bin\Debug\net6.0\SentimentAnalysis.deps.json
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\bin\Debug\net6.0\SentimentAnalysis.dll
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\bin\Debug\net6.0\SentimentAnalysis.pdb
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.AssemblyInfoInputs.cache
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.AssemblyInfo.cs
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.csproj.CoreCompileInputs.cache
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.sourcelink.json
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.dll
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\refint\SentimentAnalysis.dll
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\SentimentAnalysis.pdb
+C:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1\mini-app-codeproject-ai-mindsdb\CodeProject.AI-Modules\CodeProject.AI-SentimentAnalysis\obj\Debug\net6.0\ref\SentimentAnalysis.dll

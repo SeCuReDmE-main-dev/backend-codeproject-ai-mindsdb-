@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PortraitFilter")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6125653520a9f400d86578f2a36e6fa50f1c22b6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+89e5c59326984b96c7dcbf47c98622d54b248a9f")]
 [assembly: System.Reflection.AssemblyProductAttribute("PortraitFilter")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PortraitFilter")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
