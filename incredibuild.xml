@@ -52,6 +52,19 @@
       </SupportedVersions>
     </VSIntegration>
     
+    <!-- Supported platforms - Updated to match available configurations -->
+    <Platforms>
+      <Platform>Any CPU</Platform>
+      <Platform>x86</Platform>
+      <Platform>ARM64</Platform>
+    </Platforms>
+    
+    <!-- Supported configurations -->
+    <Configurations>
+      <Configuration>Debug</Configuration>
+      <Configuration>Release</Configuration>
+    </Configurations>
+    
     <!-- Environment variables needed for build -->
     <Environment>
       <Variable Name="PATH" Value="%PATH%" />
@@ -66,7 +79,7 @@
       <Variable Name="DOTNET_CLI_HOME" Value="%USERPROFILE%" />
     </Environment>
     
-    <!-- Output settings -->
+    <!-- Output settings - Fixed tag name from 'o' to 'Output' -->
     <Output>
       <!-- Enable detailed output for build logs -->
       <VerbosityLevel>Normal</VerbosityLevel>
