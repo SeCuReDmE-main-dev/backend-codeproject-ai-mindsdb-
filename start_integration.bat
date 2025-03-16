@@ -4,6 +4,45 @@ echo CodeProject AI + MindsDB Integration Launcher
 echo ===============================================
 echo.
 
+:: Add port checking function at the start
+setlocal EnableDelayedExpansion
+
+:check_port
+:: Usage: call :check_port port_number
+set "port=%~1"
+set "temp_file=%temp%\port_check_%random%.txt"
+netstat -an | findstr /R /C:":%port% .*LISTENING" > "%temp_file%"
+for /f "tokens=5" %%a in ('type "%temp_file%"') do set "pid=%%a"
+del "%temp_file%" 2>nul
+if defined pid (
+    for /f "tokens=1,2" %%a in ('tasklist /fi "PID eq !pid!" ^| findstr /i "!pid!"') do (
+        set "process_name=%%a"
+    )
+    echo Port %port% is in use by !process_name! (PID: !pid!)
+    exit /b 1
+)
+exit /b 0
+
+:kill_process_on_port
+:: Usage: call :kill_process_on_port port_number
+set "port=%~1"
+set "temp_file=%temp%\port_check_%random%.txt"
+netstat -ano | findstr /R /C:":%port% .*LISTENING" > "%temp_file%"
+for /f "tokens=5" %%a in ('type "%temp_file%"') do set "pid=%%a"
+del "%temp_file%" 2>nul
+if defined pid (
+    echo Terminating process using port %port% (PID: !pid!)
+    taskkill /F /PID !pid! >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo Process terminated successfully
+        exit /b 0
+    ) else (
+        echo Failed to terminate process
+        exit /b 1
+    )
+)
+exit /b 0
+
 :: Check if .NET SDK is installed
 echo Checking for .NET SDK...
 dotnet --version >nul 2>&1
@@ -159,32 +198,53 @@ if %ERRORLEVEL% neq 0 (
 echo %~2 is ready on port %~1.
 exit /b 0
 
+:verify_and_start_service
+:: Usage: call :verify_and_start_service port service_name command
+set "port=%~1"
+set "service_name=%~2"
+set "command=%~3"
+
+call :check_port %port%
+if !errorlevel! equ 1 (
+    choice /C YN /N /M "Port %port% is in use. Terminate the process? (Y/N) "
+    if !errorlevel! equ 1 (
+        call :kill_process_on_port %port%
+        if !errorlevel! equ 1 (
+            echo Failed to free port %port%. Please resolve manually.
+            goto error_exit
+        )
+    ) else (
+        echo Cannot start %service_name% - port %port% is in use
+        goto error_exit
+    )
+)
+
+start cmd /k "%command%"
+call :verify_service %port% "%service_name%"
+exit /b 0
+
 :start_codeproject
 echo.
 echo Starting CodeProject AI Server...
-start cmd /k "cd /d %SERVER_SRC% && dotnet run"
-call :verify_service %CODEPROJECT_PORT% "CodeProject AI Server"
+call :verify_and_start_service %CODEPROJECT_PORT% "CodeProject AI Server" "cd /d %SERVER_SRC% && dotnet run"
 goto end
 
 :start_mindsdb
 echo.
 echo Starting MindsDB Server...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
-call :verify_service %MINDSDB_PORT% "MindsDB Server"
+call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
 goto end
 
 :start_app_codeproject
 echo.
 echo Starting App CodeProject AI Server...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
-call :verify_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server"
+call :verify_and_start_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
 goto end
 
 :start_app_mindsdb
 echo.
 echo Starting App MindsDB Server...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
-call :verify_service %APP_MINDSDB_PORT% "App MindsDB Server"
+call :verify_and_start_service %APP_MINDSDB_PORT% "App MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
 goto end
 
 :start_sentiment
@@ -208,22 +268,14 @@ goto end
 :start_all_hubs
 echo.
 echo Starting all hub services...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %CELEBRUM_DIR% && python codeproject_ai_server.py --port=%CELEBRUM_PORT%"
-call :verify_service %CELEBRUM_PORT% "CeLeBrUm Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %SENNTI_DIR% && python mindsdb_server.py --port=%SENNTI_PORT%"
-call :verify_service %SENNTI_PORT% "SenNnT-i Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %EBAAZ_DIR% && python yolo_model.py"
-call :verify_service %EBAAZ_PORT% "EbaAaZ Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %NEUURO_DIR% && python h2o_3_automl.py"
-call :verify_service %NEUURO_PORT% "NeuUuR-o Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %REAASN_DIR% && python byom_function.py"
-call :verify_service %REAASN_PORT% "ReaAaS-n Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %HIPPOCAMPUS_DIR% && python db_manager.py"
-call :verify_service %HIPPOCAMPUS_PORT% "Hippocampus Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %CORPUS_CALLOSUM_DIR% && python quantum_ops.py"
-call :verify_service %CORPUS_CALLOSUM_PORT% "Corpus Callosum Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %PREFRONTAL_CORTEX_DIR% && python ai_persona.py"
-call :verify_service %PREFRONTAL_CORTEX_PORT% "Prefrontal Cortex Hub"
+call :verify_and_start_service %CELEBRUM_PORT% "CeLeBrUm Hub" "call conda.bat activate SeCuReDmE_env && cd /d %CELEBRUM_DIR% && python codeproject_ai_server.py --port=%CELEBRUM_PORT%"
+call :verify_and_start_service %SENNTI_PORT% "SenNnT-i Hub" "call conda.bat activate SeCuReDmE_env && cd /d %SENNTI_DIR% && python mindsdb_server.py --port=%SENNTI_PORT%"
+call :verify_and_start_service %EBAAZ_PORT% "EbaAaZ Hub" "call conda.bat activate SeCuReDmE_env && cd /d %EBAAZ_DIR% && python yolo_model.py"
+call :verify_and_start_service %NEUURO_PORT% "NeuUuR-o Hub" "call conda.bat activate SeCuReDmE_env && cd /d %NEUURO_DIR% && python h2o_3_automl.py"
+call :verify_and_start_service %REAASN_PORT% "ReaAaS-n Hub" "call conda.bat activate SeCuReDmE_env && cd /d %REAASN_DIR% && python byom_function.py"
+call :verify_and_start_service %HIPPOCAMPUS_PORT% "Hippocampus Hub" "call conda.bat activate SeCuReDmE_env && cd /d %HIPPOCAMPUS_DIR% && python db_manager.py"
+call :verify_and_start_service %CORPUS_CALLOSUM_PORT% "Corpus Callosum Hub" "call conda.bat activate SeCuReDmE_env && cd /d %CORPUS_CALLOSUM_DIR% && python quantum_ops.py"
+call :verify_and_start_service %PREFRONTAL_CORTEX_PORT% "Prefrontal Cortex Hub" "call conda.bat activate SeCuReDmE_env && cd /d %PREFRONTAL_CORTEX_DIR% && python ai_persona.py"
 goto end
 
 :start_all
@@ -233,20 +285,16 @@ echo.
 call :start_all_hubs
 echo 1. Starting CodeProject AI Server...
 cd /d %SERVER_DIR%
-start cmd /k "cd /d %SERVER_SRC% && dotnet run"
-call :verify_service %CODEPROJECT_PORT% "CodeProject AI Server"
+call :verify_and_start_service %CODEPROJECT_PORT% "CodeProject AI Server" "cd /d %SERVER_SRC% && dotnet run"
 
 echo 2. Starting MindsDB Server...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
-call :verify_service %MINDSDB_PORT% "MindsDB Server"
+call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
 
 echo 3. Starting App CodeProject AI Server...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
-call :verify_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server"
+call :verify_and_start_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
 
 echo 4. Starting App MindsDB Server...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
-call :verify_service %APP_MINDSDB_PORT% "App MindsDB Server"
+call :verify_and_start_service %APP_MINDSDB_PORT% "App MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
 
 echo 5. Starting SentimentAnalysis Module...
 start cmd /k "cd /d %SENTIMENT_MODULE% && dotnet run"
