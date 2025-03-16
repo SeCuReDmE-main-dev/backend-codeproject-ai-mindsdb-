@@ -1,0 +1,56 @@
+{
+    "incredibuild": {
+        "enabled": true,
+        "max_cpus": 16,
+        "build_timeout": 3600,
+        "build_config": "Release|x64",
+        "temp_dir": "temp",
+        "log_dir": "logs",
+        "retry_attempts": 3,
+        "system_utilization": {
+            "cpu": 80,
+            "memory": 4096,
+            "disk": 70
+        }
+    },
+    "mindsdb": {
+        "host": "localhost",
+        "port": 47334,
+        "api": {
+            "mongo": {
+                "port": 47337,
+                "enabled": true
+            },
+            "mysql": {
+                "port": 47335,
+                "enabled": true
+            }
+        }
+    },
+    "model_settings": {
+        "cache_size": 10,
+        "training": {
+            "batch_size": 32,
+            "epochs": 100,
+            "validation_split": 0.2,
+            "learning_rate": 0.001
+        },
+        "architecture": {
+            "layers": [128, 64, 32, 1],
+            "activations": ["relu", "relu", "relu", "linear"]
+        }
+    },
+    "paths": {
+        "models_dir": "models",
+        "temp_dir": "temp",
+        "log_dir": "logs",
+        "data_dir": "data"
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "neural_coordinator.log",
+        "max_size": 10485760,
+        "backup_count": 5
+    }
+}
