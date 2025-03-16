@@ -61,6 +61,24 @@ set "EBAAZ_DIR=%MICROSERVICES_DIR%\ebaaz_hub"
 set "NEUURO_DIR=%MICROSERVICES_DIR%\neuuro_hub"
 set "REAASN_DIR=%MICROSERVICES_DIR%\reaasn_hub"
 
+:: Core Services (5000-5009)
+set "CODEPROJECT_PORT=5000"
+set "APP_CODEPROJECT_PORT=5001"
+set "APP_MINDSDB_PORT=5002"
+
+:: Hub Services (5010-5019)
+set "CELEBRUM_PORT=5010"
+set "SENNTI_PORT=5011"
+set "EBAAZ_PORT=5012"
+set "NEUURO_PORT=5013"
+set "REAASN_PORT=5014"
+set "HIPPOCAMPUS_PORT=5015"
+set "CORPUS_CALLOSUM_PORT=5016"
+set "PREFRONTAL_CORTEX_PORT=5017"
+
+:: MindsDB Services (47330-47339)
+set "MINDSDB_PORT=47334"
+
 :: Verify directories exist
 echo Checking required directories...
 if not exist "%SERVER_DIR%" (
@@ -134,39 +152,39 @@ if %ERRORLEVEL% EQU 0 goto end
 :: Usage: call :verify_service <port> <service_name>
 curl -f http://localhost:%~1/health 2>nul >nul
 if %ERRORLEVEL% neq 0 (
-    echo Waiting for %~2 to start...
+    echo Waiting for %~2 to start on port %~1...
     timeout /t 2 >nul
     goto verify_service
 )
-echo %~2 is ready.
+echo %~2 is ready on port %~1.
 exit /b 0
 
 :start_codeproject
 echo.
 echo Starting CodeProject AI Server...
 start cmd /k "cd /d %SERVER_SRC% && dotnet run"
-call :verify_service 5000 "CodeProject AI Server"
+call :verify_service %CODEPROJECT_PORT% "CodeProject AI Server"
 goto end
 
 :start_mindsdb
 echo.
 echo Starting MindsDB Server...
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
-call :verify_service 47334 "MindsDB Server"
+call :verify_service %MINDSDB_PORT% "MindsDB Server"
 goto end
 
 :start_app_codeproject
 echo.
 echo Starting App CodeProject AI Server...
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
-call :verify_service 5001 "App CodeProject AI Server"
+call :verify_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server"
 goto end
 
 :start_app_mindsdb
 echo.
 echo Starting App MindsDB Server...
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
-call :verify_service 5002 "App MindsDB Server"
+call :verify_service %APP_MINDSDB_PORT% "App MindsDB Server"
 goto end
 
 :start_sentiment
@@ -190,22 +208,22 @@ goto end
 :start_all_hubs
 echo.
 echo Starting all hub services...
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %CELEBRUM_DIR% && python codeproject_ai_server.py"
-call :verify_service 5001 "CeLeBrUm Hub"
-start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %SENNTI_DIR% && python mindsdb_server.py"
-call :verify_service 5002 "SenNnT-i Hub"
+start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %CELEBRUM_DIR% && python codeproject_ai_server.py --port=%CELEBRUM_PORT%"
+call :verify_service %CELEBRUM_PORT% "CeLeBrUm Hub"
+start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %SENNTI_DIR% && python mindsdb_server.py --port=%SENNTI_PORT%"
+call :verify_service %SENNTI_PORT% "SenNnT-i Hub"
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %EBAAZ_DIR% && python yolo_model.py"
-call :verify_service 5003 "EbaAaZ Hub"
+call :verify_service %EBAAZ_PORT% "EbaAaZ Hub"
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %NEUURO_DIR% && python h2o_3_automl.py"
-call :verify_service 5004 "NeuUuR-o Hub"
+call :verify_service %NEUURO_PORT% "NeuUuR-o Hub"
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %REAASN_DIR% && python byom_function.py"
-call :verify_service 5005 "ReaAaS-n Hub"
+call :verify_service %REAASN_PORT% "ReaAaS-n Hub"
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %HIPPOCAMPUS_DIR% && python db_manager.py"
-call :verify_service 5006 "Hippocampus Hub"
+call :verify_service %HIPPOCAMPUS_PORT% "Hippocampus Hub"
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %CORPUS_CALLOSUM_DIR% && python quantum_ops.py"
-call :verify_service 5007 "Corpus Callosum Hub"
+call :verify_service %CORPUS_CALLOSUM_PORT% "Corpus Callosum Hub"
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %PREFRONTAL_CORTEX_DIR% && python ai_persona.py"
-call :verify_service 5008 "Prefrontal Cortex Hub"
+call :verify_service %PREFRONTAL_CORTEX_PORT% "Prefrontal Cortex Hub"
 goto end
 
 :start_all
@@ -216,19 +234,19 @@ call :start_all_hubs
 echo 1. Starting CodeProject AI Server...
 cd /d %SERVER_DIR%
 start cmd /k "cd /d %SERVER_SRC% && dotnet run"
-call :verify_service 5000 "CodeProject AI Server"
+call :verify_service %CODEPROJECT_PORT% "CodeProject AI Server"
 
 echo 2. Starting MindsDB Server...
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
-call :verify_service 47334 "MindsDB Server"
+call :verify_service %MINDSDB_PORT% "MindsDB Server"
 
 echo 3. Starting App CodeProject AI Server...
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
-call :verify_service 5001 "App CodeProject AI Server"
+call :verify_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server"
 
 echo 4. Starting App MindsDB Server...
 start cmd /k "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
-call :verify_service 5002 "App MindsDB Server"
+call :verify_service %APP_MINDSDB_PORT% "App MindsDB Server"
 
 echo 5. Starting SentimentAnalysis Module...
 start cmd /k "cd /d %SENTIMENT_MODULE% && dotnet run"
