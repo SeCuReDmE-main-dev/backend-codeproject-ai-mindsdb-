@@ -4,6 +4,10 @@ import json
 import psycopg2
 from pymongo import MongoClient
 import os
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import datetime
 
 # Database Configuration
 POSTGRESQL_CONFIG = {
@@ -41,6 +45,60 @@ MINDSDB_CONFIG = {
         }
     }
 }
+
+# Create the database directory if it doesn't exist
+os.makedirs('database', exist_ok=True)
+
+# Create a database engine
+engine = create_engine('sqlite:///database/app.db', echo=True)
+
+# Create a base class for our models
+Base = declarative_base()
+
+# Define the AI Models table
+class AIModel(Base):
+    __tablename__ = 'ai_models'
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    description = Column(Text)
+    status = Column(String(20), default='active')
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return f"<AIModel(name='{self.name}', status='{self.status}')>"
+
+# Create all tables
+def setup_database():
+    Base.metadata.create_all(engine)
+    print("Database tables created successfully.")
+    
+    # Create a session to add some initial data if needed
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    
+    # Check if we have any models already
+    existing_models = session.query(AIModel).count()
+    
+    if existing_models == 0:
+        # Add some sample models
+        sample_models = [
+            AIModel(name="CodeProject.AI Object Detection", 
+                   description="Detects objects in images using YOLO"),
+            AIModel(name="MindsDB Text Prediction", 
+                   description="AI-powered text prediction model")
+        ]
+        
+        session.add_all(sample_models)
+        session.commit()
+        print("Sample data added to the database.")
+    
+    session.close()
+
+if __name__ == "__main__":
+    setup_database()
+    print("Database setup complete. The 'ai_models' table has been created.")
 
 @contextmanager
 def create_sqlite_connection(db_file):

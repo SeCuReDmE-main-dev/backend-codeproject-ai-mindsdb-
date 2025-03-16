@@ -73,6 +73,8 @@ This project is a mini app built using the duo server side CodeProject AI server
    python database_setup.py
    ```
 
+   This script will create the necessary database tables including `ai_models` which is required for the application.
+
 ### Setting up a Conda Environment
 
 1. Create a conda environment:
@@ -135,6 +137,18 @@ If you encounter Python installation issues in MSYS2 or similar environments, co
 - If you encounter "No connection could be made" errors with port 47337, make sure MindsDB is properly configured to use port 5001 as specified in the server configuration.
 - Verify that all services are running before attempting connections.
 - Check for any firewall rules that might be blocking the required ports.
+
+### Database Issues
+- If you encounter errors like `no such table: ai_models`, run the database setup script:
+  ```bash
+  python server/database_setup.py
+  ```
+- Make sure you have write permissions to the database directory.
+- If the error persists, try removing the existing database file and running the setup script again:
+  ```bash
+  rm server/database/app.db
+  python server/database_setup.py
+  ```
 
 ## Contributing Guidelines
 
