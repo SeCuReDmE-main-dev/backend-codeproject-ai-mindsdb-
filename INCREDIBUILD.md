@@ -1,113 +1,132 @@
-# IncrediBuild Integration for SeCuReDmE
+# IncrediBuild Integration Guide
 
-This document describes how to use IncrediBuild with the SeCuReDmE project to accelerate build times by distributing build tasks across multiple cores or networked computers.
+This guide covers the IncrediBuild integration with SeCuReDmE's neural modules and build system.
 
-## Prerequisites
+## Overview
 
-- IncrediBuild installed (version 10.0 or higher)
-- Windows operating system
-- .NET SDK installed
-- CodeProject AI Server solution files correctly set up
+IncrediBuild is used to accelerate:
+- Neural model training
+- Multi-module compilation
+- Distributed predictions
+- Parallel data processing
 
-## Configuration Files
+## Configuration
 
-The IncrediBuild integration consists of two main files:
+### Build Settings
 
-1. `build-with-incredibuild.bat` - The main script to configure agents and run the build
-2. `incredibuild.xml` - The XML configuration profile for IncrediBuild
+The `incredibuild.xml` file configures:
+- CPU/GPU utilization
+- Memory allocation
+- Build parallelization
+- Python acceleration
+- Neural training optimization
 
-## Agent Configuration
+### Module-Specific Settings
 
-The script automatically configures the IncrediBuild agents with the following settings:
+Each neural module can be optimized with:
+- Batch processing
+- Data parallelism
+- Model caching
+- Distributed training
 
-- **Memory Allocation**: 4GB per agent
-- **CPU Utilization**: 80% (allows system to remain responsive during builds)
-- **Idle Timeout**: 5 minutes (agents return to the pool after 5 minutes of inactivity)
-- **Network Scope**: Local network only (WAN agents are disabled)
+## Usage
 
-These settings can be modified in the `build-with-incredibuild.bat` file under the "Configure Incredibuild agent settings" section.
+### Basic Build
 
-## Using the Build Script
+```bash
+build-with-incredibuild.bat
+```
 
-To use IncrediBuild for accelerated builds:
+### Neural Training
 
-1. Open a command prompt in the SeCuReDmE project directory
-2. Run: `.\mini-app-codeproject-ai-mindsdb\build-with-incredibuild.bat`
-3. Follow the on-screen prompts to select build options
+```bash
+cd neural_forecast
+init_neural_env.bat
+```
 
-### Available Build Options
+### Dashboard Build
 
-The script provides several build options:
+```bash
+cd mindsdb-dashboard
+npm run build:incredibuild
+```
 
-1. **Release build (x64)** - Standard release build for 64-bit systems
-2. **Debug build (x64)** - Debug build with symbols for 64-bit systems
-3. **Release build (Any CPU)** - Platform-independent release build
-4. **Debug build (Any CPU)** - Platform-independent debug build
-5. **Clean solution** - Clean all compiled files from the solution
-6. **Build specific module** - Build a single module (SentimentAnalysis, PortraitFilter, or MultiModeLLM)
+## Optimization Tips
 
-### Building Specific Modules
+1. **GPU Acceleration**
+   - Enable CUDA support in incredibuild.xml
+   - Set appropriate batch sizes
+   - Configure memory limits
 
-When choosing to build a specific module (option 6), you can select from:
+2. **Neural Training**
+   - Use data parallelism
+   - Enable model caching
+   - Configure checkpointing
 
-1. SentimentAnalysis
-2. PortraitFilter
-3. MultiModeLLM
-4. All modules
+3. **Build Performance**
+   - Set appropriate CPU core limits
+   - Configure memory allocation
+   - Enable network distribution
 
-## XML Profile Configuration
+## Monitoring
 
-The `incredibuild.xml` file contains detailed settings for the build process:
+- Check build logs in `logs/build_*.log`
+- Monitor system resources
+- Review neural training metrics
+- Track build acceleration stats
 
-- **Core Allocation**: Automatically determines the optimal number of cores to use
-- **Local Cores**: Limits the number of local cores used to 4 (configurable)
-- **Parallel Build**: Enabled for maximum performance
-- **Multi-process Compilation**: Enabled to utilize multiple cores effectively
-- **Prediction**: Build prediction is enabled to anticipate and optimize build steps
-- **Visual Studio Integration**: Supports VS2019 and VS2022
+## Common Issues
 
-## Optimizing Performance
+1. **Build Slowdown**
+   - Check CPU/Memory settings
+   - Verify network connectivity
+   - Review agent availability
 
-For best performance with IncrediBuild:
+2. **Neural Training Issues**
+   - Verify CUDA configuration
+   - Check model caching
+   - Review batch settings
 
-1. **Coordinator Machine**: The machine running the build script should be powerful and have good network connectivity
-2. **Network Throughput**: Ensure good network throughput between build agents
-3. **SSD Storage**: Using SSD storage for the build directories improves performance
-4. **Memory**: Allocate sufficient memory to agents (default is 4GB per agent)
-5. **Clean Builds**: Occasional clean builds help prevent incremental build issues
+3. **Integration Problems**
+   - Validate XML configuration
+   - Check tool paths
+   - Verify environment setup
 
-## Troubleshooting
+## Best Practices
 
-If you encounter issues with IncrediBuild:
+1. **Resource Management**
+   - Set appropriate core limits
+   - Configure memory thresholds
+   - Balance GPU utilization
 
-1. **Check Agent Status**: Run `ibconsole /command=getavailableagents` to verify agents are connected
-2. **Check Build Logs**: Examine the build logs in the root directory (`build-log.txt`)
-3. **Reset Agent Configuration**: Use the option at the end of the build script to reset agents to default settings
-4. **Update IncrediBuild**: Ensure you're using the latest version of IncrediBuild
-5. **Verify Project Files**: Run `fix_project_files.bat` to ensure all project files are correctly configured
+2. **Build Configuration**
+   - Use predictive execution
+   - Enable file monitoring
+   - Configure parallel compilation
 
-## Advanced Configuration
+3. **Neural Optimization**
+   - Enable checkpoint recovery
+   - Use distributed training
+   - Configure batch processing
 
-Advanced users can modify the `incredibuild.xml` file directly to:
+## Environment Variables
 
-- Change memory allocation per agent
-- Adjust CPU utilization percentage
-- Modify build prediction settings
-- Add custom environment variables
-- Configure output verbosity levels
+- `USE_INCREDIBUILD`: Enable/disable acceleration
+- `INCREDIBUILD_MAX_CPU`: CPU core limit
+- `INCREDIBUILD_MAX_MEM`: Memory allocation
+- `CUDA_VISIBLE_DEVICES`: GPU selection
 
-## License Requirements
+## Tool Integration
 
-IncrediBuild functionality depends on your license:
+### Supported Tools
+- Visual Studio
+- MSBuild
+- Python
+- Node.js
+- CUDA toolkit
 
-- **Free Version**: Limited cores and build types
-- **Build Tools**: Full support for C++ and .NET builds
-- **Enterprise**: Full distribution of all build processes
-
-Contact IncrediBuild sales for license options if you need additional capabilities.
-
-## For More Information
-
-- IncrediBuild Documentation: https://www.incredibuild.com/docs
-- CodeProject AI Documentation: https://www.codeproject.com/AI
-- SeCuReDmE Documentation: Refer to the project's main README files
+### Build Coordination
+- Automatic dependency detection
+- Parallel execution
+- Resource optimization
+- Progress monitoring
