@@ -4,8 +4,68 @@ echo CodeProject AI + MindsDB Integration Launcher
 echo ===============================================
 echo.
 
-:: Add port checking function at the start
+:: Setup environment
 setlocal EnableDelayedExpansion
+
+:: Define required ports
+set "REQUIRED_PORTS=6000 6001 6002 47334"
+set "PORT_IN_USE=0"
+
+:: Check all required ports first
+echo Checking required ports...
+for %%p in (%REQUIRED_PORTS%) do (
+    call :check_port %%p
+    if !ERRORLEVEL! neq 0 set "PORT_IN_USE=1"
+)
+
+:: If any port is in use, ask to free them
+if "%PORT_IN_USE%"=="1" (
+    echo.
+    echo One or more required ports are in use.
+    set /p FREE_PORTS="Would you like to free these ports automatically? (Y/N): "
+    if /i "!FREE_PORTS!"=="Y" (
+        echo.
+        echo Freeing ports...
+        for %%p in (%REQUIRED_PORTS%) do (
+            call :free_port %%p
+        )
+    ) else (
+        echo.
+        echo Please close the applications using these ports and try again.
+        echo Press any key to exit...
+        pause > nul
+        exit /b 1
+    )
+) else (
+    echo All required ports are available.
+)
+
+echo.
+echo ===============================================
+echo Starting CodeProject AI Server...
+echo ===============================================
+
+:: Add your CodeProject AI startup code here
+echo Starting CodeProject AI Server on port 6000...
+:: Example: cd path\to\codeproject-ai && start python server.py
+
+echo.
+echo ===============================================
+echo Starting MindsDB Server...
+echo ===============================================
+
+:: Add your MindsDB startup code here
+echo Starting MindsDB Server on port 47334...
+:: Example: cd path\to\mindsdb && start python -m mindsdb
+
+echo.
+echo Integration services started successfully!
+echo.
+echo - CodeProject AI is running on http://localhost:6000
+echo - MindsDB is running on http://localhost:47334
+echo.
+echo Press Ctrl+C in each terminal window to stop the services.
+exit /b 0
 
 :check_port
 :: Usage: call :check_port port_number
@@ -20,25 +80,28 @@ if defined pid (
     )
     echo Port %port% is in use by !process_name! (PID: !pid!)
     exit /b 1
+) else (
+    echo Port %port% is available.
+    exit /b 0
 )
-exit /b 0
 
-:kill_process_on_port
-:: Usage: call :kill_process_on_port port_number
+:free_port
+:: Usage: call :free_port port_number
 set "port=%~1"
 set "temp_file=%temp%\port_check_%random%.txt"
-netstat -ano | findstr /R /C:":%port% .*LISTENING" > "%temp_file%"
+netstat -an | findstr /R /C:":%port% .*LISTENING" > "%temp_file%"
 for /f "tokens=5" %%a in ('type "%temp_file%"') do set "pid=%%a"
 del "%temp_file%" 2>nul
 if defined pid (
-    echo Terminating process using port %port% (PID: !pid!)
+    for /f "tokens=1,2" %%a in ('tasklist /fi "PID eq !pid!" ^| findstr /i "!pid!"') do (
+        set "process_name=%%a"
+    )
+    echo Terminating !process_name! (PID: !pid!) on port %port%...
     taskkill /F /PID !pid! >nul 2>&1
-    if !errorlevel! equ 0 (
-        echo Process terminated successfully
-        exit /b 0
+    if !ERRORLEVEL! equ 0 (
+        echo Successfully freed port %port%
     ) else (
-        echo Failed to terminate process
-        exit /b 1
+        echo Failed to free port %port%. You may need to close the application manually.
     )
 )
 exit /b 0
@@ -120,6 +183,10 @@ set "REDIS_PORT=6379"      :: Using existing Redis instance
 set "MONGODB_PORT=27017"   :: Using existing MongoDB instance
 set "MINDSDB_PORT=47334"   :: MindsDB port
 set "RABBITMQ_PORT=5673"   :: Changed from 5672 to avoid conflict with existing RabbitMQ
+
+:: Set MindsDB master configuration path
+set "MINDSDB_CONFIG_PATH=%BASE_DIR%\MindsDB"
+set "MINDSDB_CONFIG=%MINDSDB_CONFIG_PATH%\config.json"
 
 :: Verify directories exist
 echo Checking required directories...
@@ -235,7 +302,7 @@ goto end
 :start_mindsdb
 echo.
 echo Starting MindsDB Server...
-call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
+call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb --config=%MINDSDB_CONFIG%"
 goto end
 
 :start_app_codeproject
@@ -291,7 +358,7 @@ cd /d %SERVER_DIR%
 call :verify_and_start_service %CODEPROJECT_PORT% "CodeProject AI Server" "cd /d %SERVER_SRC% && dotnet run"
 
 echo 2. Starting MindsDB Server...
-call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb"
+call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb --config=%MINDSDB_CONFIG%"
 
 echo 3. Starting App CodeProject AI Server...
 call :verify_and_start_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"

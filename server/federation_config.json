@@ -1,0 +1,65 @@
+{
+    "name": "minds",
+    "type": "federated",
+    "stores": [
+        {
+            "name": "neural_network",
+            "provider": "s3",
+            "region": "us-east-1",
+            "prefix": "/neural_network/",
+            "delimiter": "/",
+            "include": ["*.json"]
+        },
+        {
+            "name": "mflix",
+            "provider": "s3",
+            "region": "us-east-1",
+            "prefix": "/mflix/",
+            "delimiter": "/",
+            "include": ["*.json"]
+        }
+    ],
+    "databases": [
+        {
+            "name": "minds",
+            "collections": [
+                {
+                    "name": "Sessions",
+                    "dataSources": [
+                        {
+                            "store": "mflix",
+                            "path": "/sessions.json"
+                        }
+                    ]
+                },
+                {
+                    "name": "Users",
+                    "dataSources": [
+                        {
+                            "store": "mflix",
+                            "path": "/users.json"
+                        }
+                    ]
+                },
+                {
+                    "name": "Models",
+                    "dataSources": [
+                        {
+                            "store": "neural_network",
+                            "path": "/models.json"
+                        }
+                    ]
+                },
+                {
+                    "name": "TrainingData",
+                    "dataSources": [
+                        {
+                            "store": "neural_network",
+                            "path": "/training_data.json"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
