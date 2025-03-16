@@ -87,50 +87,70 @@ echo ===============================================
 echo Configuring Incredibuild Agent Settings
 echo ===============================================
 
-echo Checking current agent configuration...
-ibconsole /getconfig > "%TEMP%\ib_config_temp.txt"
+echo Checking if Standalone mode is enabled...
+ibconsole /command=GetCoordSettings > "%TEMP%\ib_config_temp.txt"
+findstr /C:"StandAlone" "%TEMP%\ib_config_temp.txt" > nul
+if %ERRORLEVEL% equ 0 (
+    echo Standalone mode appears to be enabled.
+    echo You may want to disable it in the IncrediBuild Agent Settings dialog.
+)
 
-:: Configure Incredibuild agents
-echo Configuring Incredibuild agents...
-ibconsole /command=setcoordavail /state=enable
+:: Configure Incredibuild coordinator availability
+echo Configuring Incredibuild coordinator...
+ibconsole /command="SetCoordAvail" /state="enable" > nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    echo Coordinator availability configured.
+) else (
+    echo Note: Failed to configure coordinator availability. 
+    echo This is not critical, continuing...
+)
 
-:: Set agent memory allocation (4GB)
-ibconsole /command=setagentparam /param=MaximumAvailableMemory /value=4096
+:: Configure agent settings through the IncrediBuild settings file
+echo Configuring agent settings through registry...
 
-:: Set CPU utilization (default 80%)
-ibconsole /command=setagentparam /param=CPUUtilization /value=80
+:: Get the available solution configurations
+echo Reading available solution configurations...
+set "CONFIG_FILE=%TEMP%\ib_solution_configs.txt"
+BuildConsole "%SOLUTION_FILE%" /showtargets > "%CONFIG_FILE%"
 
-:: Set idle timeout (5 minutes)
-ibconsole /command=setagentparam /param=IdleTimeout /value=300
-
-:: Allow only local network agents
-ibconsole /command=setagentparam /param=AllowWANAgents /value=0
+findstr /C:"Available solution configurations:" "%CONFIG_FILE%" > nul
+if %ERRORLEVEL% equ 0 (
+    echo Found configuration information in BuildConsole output.
+    for /f "tokens=1* delims=:" %%a in ('findstr /C:"Available solution configurations:" "%CONFIG_FILE%"') do (
+        set "AVAILABLE_CONFIGS=%%b"
+    )
+    echo Available configurations:%AVAILABLE_CONFIGS%
+) else (
+    echo Could not determine available solution configurations.
+    echo Defaulting to standard configurations.
+    set "AVAILABLE_CONFIGS=    Debug|Any CPU    Release|Any CPU    Debug|x86    Release|x86"
+)
 
 :: Display build agent statistics
 echo.
 echo ===============================================
-echo Incredibuild Agent Statistics
+echo Incredibuild Agent Information
 echo ===============================================
-ibconsole /command=getavailableagents
+ibconsole /command="GetHelpers"
 
 echo.
 echo ===============================================
 echo Build Options
 echo ===============================================
-echo 1. Release build (x64)
-echo 2. Debug build (x64)
-echo 3. Release build (Any CPU)
-echo 4. Debug build (Any CPU)
+echo 1. Release build (Any CPU)
+echo 2. Debug build (Any CPU)
+echo 3. Release build (x86)
+echo 4. Debug build (x86)
 echo 5. Clean solution
 echo 6. Build specific module
 echo.
 
 choice /C 123456 /N /M "Select a build option [1-6]: "
 
-if %ERRORLEVEL% EQU 1 set "BUILD_CONFIG=Release|x64"
-if %ERRORLEVEL% EQU 2 set "BUILD_CONFIG=Debug|x64"
-if %ERRORLEVEL% EQU 3 set "BUILD_CONFIG=Release|Any CPU"
-if %ERRORLEVEL% EQU 4 set "BUILD_CONFIG=Debug|Any CPU"
+if %ERRORLEVEL% EQU 1 set "BUILD_CONFIG=Release|Any CPU"
+if %ERRORLEVEL% EQU 2 set "BUILD_CONFIG=Debug|Any CPU"
+if %ERRORLEVEL% EQU 3 set "BUILD_CONFIG=Release|x86"
+if %ERRORLEVEL% EQU 4 set "BUILD_CONFIG=Debug|x86"
 if %ERRORLEVEL% EQU 5 goto clean_solution
 if %ERRORLEVEL% EQU 6 goto build_module
 
@@ -140,7 +160,7 @@ echo.
 
 :: Build solution with Incredibuild using XML profile
 echo Building solution with Incredibuild...
-BuildConsole "%SOLUTION_FILE%" /build /cfg="%BUILD_CONFIG%" /useenv /profile="%XML_CONFIG%" /log="%BUILD_LOG%" /MaxCPUs=16
+BuildConsole "%SOLUTION_FILE%" /build /cfg="%BUILD_CONFIG%" /useenv /prefs=IncrediBuildFilePrefs /out="%BUILD_LOG%" /MaxCPUs=16
 
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Build failed. Check the log file at %BUILD_LOG% for details.
@@ -157,8 +177,11 @@ if "%BUILD_CONFIG:~0,7%"=="Release" (
     echo Do you want to copy the release build to deployment location? (Y/N)
     choice /C YN /N
     if %ERRORLEVEL% EQU 1 (
+        echo Creating deployment directory if it doesn't exist...
+        if not exist "%ROOT_DIR%\deployment\" mkdir "%ROOT_DIR%\deployment\"
+        
         echo Copying release build to deployment location...
-        xcopy /E /Y /I "%SOLUTION_DIR%\bin\Release\*.*" "%ROOT_DIR%\deployment\"
+        xcopy /E /Y /I "%SOLUTION_DIR%\bin\%BUILD_CONFIG%\*.*" "%ROOT_DIR%\deployment\"
         echo Copy completed.
     )
 )
@@ -167,7 +190,21 @@ goto end
 
 :clean_solution
 echo Cleaning solution...
-BuildConsole "%SOLUTION_FILE%" /clean /cfg="Release|x64" /useenv /log="%BUILD_LOG%"
+echo Select configuration to clean:
+echo 1. Release|Any CPU
+echo 2. Debug|Any CPU
+echo 3. Release|x86
+echo 4. Debug|x86
+echo.
+
+choice /C 1234 /N /M "Select configuration [1-4]: "
+
+if %ERRORLEVEL% EQU 1 set "CLEAN_CONFIG=Release|Any CPU"
+if %ERRORLEVEL% EQU 2 set "CLEAN_CONFIG=Debug|Any CPU"
+if %ERRORLEVEL% EQU 3 set "CLEAN_CONFIG=Release|x86"
+if %ERRORLEVEL% EQU 4 set "CLEAN_CONFIG=Debug|x86"
+
+BuildConsole "%SOLUTION_FILE%" /clean /cfg="%CLEAN_CONFIG%" /useenv /out="%BUILD_LOG%"
 echo Solution cleaned. Log file: %BUILD_LOG%
 goto end
 
@@ -186,7 +223,7 @@ choice /C 1234 /N /M "Select a module [1-4]: "
 
 if %ERRORLEVEL% EQU 1 set "MODULE_DIR=%MODULES_DIR%\CodeProject.AI-SentimentAnalysis"
 if %ERRORLEVEL% EQU 2 set "MODULE_DIR=%MODULES_DIR%\CodeProject.AI-PortraitFilter"
-if %ERRORLEVEL% EQU 3 set "MODULE_DIR=%MODULES_DIR%\CodeProject.AI-MultiModeLLM"
+if %ERRORLEVEL% EQU 3 set "MODULE_DIR=%ROOT_DIR%\CodeProject.AI-MultiModeLLM"
 if %ERRORLEVEL% EQU 4 goto build_all_modules
 
 :: Check if module directory exists
@@ -209,17 +246,21 @@ echo Building module with project file: %PROJECT_FILE%
 :: Choose build configuration for module
 echo.
 echo Select build configuration:
-echo 1. Release (x64)
-echo 2. Debug (x64)
+echo 1. Release|Any CPU
+echo 2. Debug|Any CPU
+echo 3. Release|x86
+echo 4. Debug|x86
 echo.
 
-choice /C 12 /N /M "Select configuration [1-2]: "
+choice /C 1234 /N /M "Select configuration [1-4]: "
 
-if %ERRORLEVEL% EQU 1 set "MODULE_CONFIG=Release|x64"
-if %ERRORLEVEL% EQU 2 set "MODULE_CONFIG=Debug|x64"
+if %ERRORLEVEL% EQU 1 set "MODULE_CONFIG=Release|Any CPU"
+if %ERRORLEVEL% EQU 2 set "MODULE_CONFIG=Debug|Any CPU"
+if %ERRORLEVEL% EQU 3 set "MODULE_CONFIG=Release|x86"
+if %ERRORLEVEL% EQU 4 set "MODULE_CONFIG=Debug|x86"
 
 echo Building module with configuration: %MODULE_CONFIG%
-BuildConsole "%PROJECT_FILE%" /build /cfg="%MODULE_CONFIG%" /useenv /profile="%XML_CONFIG%" /log="%BUILD_LOG%"
+BuildConsole "%PROJECT_FILE%" /build /cfg="%MODULE_CONFIG%" /useenv /out="%BUILD_LOG%"
 
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Module build failed. Check the log file at %BUILD_LOG% for details.
@@ -237,12 +278,27 @@ set "FOUND_PROJECTS=0"
 for /r "%MODULES_DIR%" %%f in (*.csproj) do (
     set /a FOUND_PROJECTS+=1
     echo Building %%f...
-    BuildConsole "%%f" /build /cfg="Release|x64" /useenv /profile="%XML_CONFIG%" /log="%BUILD_LOG%.%%~nf"
+    BuildConsole "%%f" /build /cfg="Release|Any CPU" /useenv /out="%BUILD_LOG%.%%~nf"
     
     if %ERRORLEVEL% neq 0 (
         echo ERROR: Build of %%f failed. Check the log for details.
     ) else (
         echo Build of %%f completed successfully.
+    )
+)
+
+:: Also check for MultiModeLLM in the root directory
+if exist "%ROOT_DIR%\CodeProject.AI-MultiModeLLM" (
+    for /r "%ROOT_DIR%\CodeProject.AI-MultiModeLLM" %%f in (*.csproj) do (
+        set /a FOUND_PROJECTS+=1
+        echo Building %%f...
+        BuildConsole "%%f" /build /cfg="Release|Any CPU" /useenv /out="%BUILD_LOG%.%%~nf"
+        
+        if %ERRORLEVEL% neq 0 (
+            echo ERROR: Build of %%f failed. Check the log for details.
+        ) else (
+            echo Build of %%f completed successfully.
+        )
     )
 )
 
@@ -253,16 +309,6 @@ if %FOUND_PROJECTS% EQU 0 (
 )
 
 :end
-:: Reset the Incredibuild agent settings to default if needed
-echo.
-echo Do you want to reset Incredibuild agent settings to default? (Y/N)
-choice /C YN /N
-if %ERRORLEVEL% EQU 1 (
-    echo Resetting Incredibuild agent settings to default...
-    ibconsole /command=resetconfig
-    echo Settings reset to default.
-)
-
 echo.
 echo ===============================================
 echo Build process complete
