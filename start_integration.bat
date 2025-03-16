@@ -431,3 +431,7 @@ echo.
 echo Press any key to exit the launcher...
 pause >nul
 exit /b 0
+
+:: Pause to keep the terminal open
+pause
+exit /b 0
