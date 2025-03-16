@@ -10,6 +10,9 @@ echo.
 :: Keep window open flag
 set "KEEP_WINDOW_OPEN=1"
 
+:: Set coordinator ID
+set "IB_COORDINATOR_ID=D64EC12F-DE4B-421E-8F43-8D54122889FD"
+
 :: Check for IncrediBuild
 echo Checking for IncrediBuild...
 where BuildConsole >nul 2>&1
@@ -33,20 +36,26 @@ echo ===============================================
 echo Configuring IncrediBuild Agent Settings
 echo ===============================================
 
-:: Disable standalone mode
+:: Disable standalone mode using registry
 echo Disabling standalone mode...
-BuildConsole /STANDALONE=Disable
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Xoreax\IncrediBuild\Builder" /v "Standalone" /t REG_DWORD /d 0 /f
 
-:: Set coordinator mode and settings
-echo Setting up coordinator settings...
-BuildConsole /AGENT /coordinator="D64EC12F-DE4B-421E-8F43-8D54122889FD"
+:: Set coordinator in registry
+echo Setting coordinator ID...
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Xoreax\IncrediBuild\Builder" /v "Coordinator" /t REG_SZ /d "%IB_COORDINATOR_ID%" /f
 
 :: Configure system resource allocation
 echo Configuring system resource allocation...
-BuildConsole /AGENT /MaxCPUS=80
-BuildConsole /AGENT /UseMultiCores=1
-BuildConsole /AGENT /AvoidLocal=0
-BuildConsole /AGENT /NoWait=1
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Xoreax\IncrediBuild\Builder" /v "MaxCPUS" /t REG_DWORD /d 80 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Xoreax\IncrediBuild\Builder" /v "MaxMemory" /t REG_DWORD /d 4096 /f
+
+:: Restart IncrediBuild Agent to apply changes
+echo Restarting IncrediBuild Agent...
+net stop "IncrediBuild Agent" >nul 2>&1
+net start "IncrediBuild Agent" >nul 2>&1
+
+:: Wait for agent to restart
+timeout /t 5 /nobreak > nul
 
 :: Display agent information
 echo.
@@ -57,33 +66,12 @@ BuildConsole /SHOWAGENT
 
 echo.
 echo ===============================================
-echo Building Solution with IncrediBuild
+echo Building Solution
 echo ===============================================
 
-:: Choose build configuration
-echo Select build configuration:
-echo 1. Release
-echo 2. Debug
-echo.
-choice /C 12 /N /M "Select configuration [1-2]: "
-
-if %ERRORLEVEL% equ 1 (
-    set "BUILD_CONFIG=Release"
-) else (
-    set "BUILD_CONFIG=Debug"
-)
-
-:: Build the solution using proper command format
-echo.
-echo Building solution in %BUILD_CONFIG% configuration...
-BuildConsole "%SOLUTION_FILE%" ^
-    /cfg="%BUILD_CONFIG%" ^
-    /UseMultiCores=1 ^
-    /AvoidLocal=0 ^
-    /NoWait=1 ^
-    /ShowTime ^
-    /ShowAgent ^
-    /Retry=3
+:: Build the solution
+echo Building solution...
+BuildConsole "%SOLUTION_FILE%" /cfg="Release" /UseIDEMonitor /ShowTime /ShowAgent /OpenMonitor /Retry=3
 
 if %ERRORLEVEL% equ 0 (
     echo.
