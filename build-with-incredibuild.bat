@@ -7,15 +7,16 @@ echo SeCuReDmE Build with IncrediBuild Script
 echo ===============================================
 echo.
 
+:: Keep window open flag
+set "KEEP_WINDOW_OPEN=1"
+
 :: Check if IncrediBuild is installed
 echo Checking for IncrediBuild...
 where BuildConsole >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo ERROR: IncrediBuild is not installed or not in PATH.
     echo Please install IncrediBuild and try again.
-    echo Press any key to exit...
-    pause > nul
-    exit /b 1
+    goto keep_window_open
 )
 echo IncrediBuild found.
 
@@ -43,15 +44,11 @@ if not exist "%SOLUTION_FILE%" (
             call "%BASE_DIR%fix_project_files.bat"
             if not exist "%SOLUTION_FILE%" (
                 echo ERROR: Could not create solution file. Please check your installation.
-                echo Press any key to exit...
-                pause > nul
-                exit /b 1
+                goto keep_window_open
             )
         ) else (
             echo ERROR: fix_project_files.bat not found. Cannot create solution file.
-            echo Press any key to exit...
-            pause > nul
-            exit /b 1
+            goto keep_window_open
         )
     )
 )
@@ -101,9 +98,51 @@ if %ERRORLEVEL% equ 0 (
 
 :: Attempt to configure IncrediBuild settings via ibconsole
 echo Configuring system resource allocation...
+
+:: CPU allocation - with retry
+set "retryCount=0"
+:retry_cpu
 IBConsole /command=SetSystemUtilization /type=CPU /value=80 2>nul
+if %ERRORLEVEL% neq 0 (
+    set /a "retryCount+=1"
+    if %retryCount% lss 3 (
+        echo Retrying CPU configuration...
+        timeout /t 2 >nul
+        goto retry_cpu
+    ) else (
+        echo WARNING: Failed to set CPU allocation, using default settings
+    )
+)
+
+:: Memory allocation - with retry
+set "retryCount=0"
+:retry_memory
 IBConsole /command=SetSystemUtilization /type=memory /value=4096 2>nul
+if %ERRORLEVEL% neq 0 (
+    set /a "retryCount+=1"
+    if %retryCount% lss 3 (
+        echo Retrying memory configuration...
+        timeout /t 2 >nul
+        goto retry_memory
+    ) else (
+        echo WARNING: Failed to set memory allocation, using default settings
+    )
+)
+
+:: Disk allocation - with retry
+set "retryCount=0"
+:retry_disk
 IBConsole /command=SetSystemUtilization /type=disk /value=80 2>nul
+if %ERRORLEVEL% neq 0 (
+    set /a "retryCount+=1"
+    if %retryCount% lss 3 (
+        echo Retrying disk configuration...
+        timeout /t 2 >nul
+        goto retry_disk
+    ) else (
+        echo WARNING: Failed to set disk allocation, using default settings
+    )
+)
 
 :: Display available agents
 echo.
@@ -164,8 +203,7 @@ BuildConsole "%SOLUTION_FILE%" /build /cfg="%BUILD_CONFIG%" /useenv /out="%BUILD
 
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Build failed. Check the log file at %BUILD_LOG% for details.
-    echo Press any key to continue...
-    pause > nul
+    goto keep_window_open
 ) else (
     echo Build completed successfully.
     echo Log file: %BUILD_LOG%
@@ -233,7 +271,7 @@ if %ERRORLEVEL% EQU 4 goto build_all_modules
 :: Check if module directory exists
 if not exist "%MODULE_DIR%" (
     echo ERROR: Module directory not found at %MODULE_DIR%
-    goto end
+    goto keep_window_open
 )
 
 :: Find project file in module directory
@@ -242,7 +280,7 @@ for /r "%MODULE_DIR%" %%f in (*.csproj) do (
     goto found_project
 )
 echo ERROR: No project file found in %MODULE_DIR%
-goto end
+goto keep_window_open
 
 :found_project
 echo Building module with project file: %PROJECT_FILE%
@@ -330,9 +368,7 @@ where conda >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Conda is not installed or not in PATH.
     echo Please install Conda before building MindsDB.
-    echo Press any key to continue...
-    pause > nul
-    goto end
+    goto keep_window_open
 )
 
 :: Check if MindsDB directory exists
@@ -427,7 +463,7 @@ if %ERRORLEVEL% neq 0 (
         call conda.bat create -n SeCuReDmE_env python=3.9 -y
     ) else (
         echo Skipping conda environment creation.
-        goto end
+        goto keep_window_open
     )
 )
 
@@ -456,6 +492,8 @@ echo.
 echo ===============================================
 echo Build process complete
 echo ===============================================
-echo Press any key to exit...
-pause > nul
-exit /b 0
+:keep_window_open
+echo.
+echo Press any key to close this window...
+pause >nul
+exit /b %ERRORLEVEL%
