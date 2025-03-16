@@ -3,21 +3,21 @@
 
 :: Display header
 echo ===============================================
-echo SeCuReDmE Build with Incredibuild Script
+echo SeCuReDmE Build with IncrediBuild Script
 echo ===============================================
 echo.
 
-:: Check if Incredibuild is installed
-echo Checking for Incredibuild...
+:: Check if IncrediBuild is installed
+echo Checking for IncrediBuild...
 where BuildConsole >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo ERROR: Incredibuild is not installed or not in PATH.
-    echo Please install Incredibuild and try again.
+    echo ERROR: IncrediBuild is not installed or not in PATH.
+    echo Please install IncrediBuild and try again.
     echo Press any key to exit...
     pause > nul
     exit /b 1
 )
-echo Incredibuild found.
+echo IncrediBuild found.
 
 :: Set paths
 set "ROOT_DIR=c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1"
@@ -61,7 +61,7 @@ echo Solution file found: %SOLUTION_FILE%
 
 :: Check for XML configuration file
 if not exist "%XML_CONFIG%" (
-    echo WARNING: Incredibuild XML configuration not found at %XML_CONFIG%
+    echo WARNING: IncrediBuild XML configuration not found at %XML_CONFIG%
     echo Creating default XML configuration...
     
     echo ^<?xml version="1.0" encoding="UTF-8"?^>> "%XML_CONFIG%"
@@ -81,57 +81,37 @@ if not exist "%XML_CONFIG%" (
     echo ^</BuildConsole^>>> "%XML_CONFIG%"
 )
 
-:: Configure Incredibuild agent settings
+:: Configure IncrediBuild agent settings
 echo.
 echo ===============================================
-echo Configuring Incredibuild Agent Settings
+echo Configuring IncrediBuild Agent Settings
 echo ===============================================
 
-echo Checking if Standalone mode is enabled...
-ibconsole /command=GetCoordSettings > "%TEMP%\ib_config_temp.txt"
-findstr /C:"StandAlone" "%TEMP%\ib_config_temp.txt" > nul
-if %ERRORLEVEL% equ 0 (
-    echo Standalone mode appears to be enabled.
-    echo You may want to disable it in the IncrediBuild Agent Settings dialog.
-)
+:: Check current settings (diagnostic only)
+echo Checking current IncrediBuild configuration...
+IBConsole /command=GetSettings > "%TEMP%\ib_config_temp.txt"
 
-:: Configure Incredibuild coordinator availability
-echo Configuring Incredibuild coordinator...
-ibconsole /command="SetCoordAvail" /state="enable" > nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    echo Coordinator availability configured.
-) else (
-    echo Note: Failed to configure coordinator availability. 
-    echo This is not critical, continuing...
-)
-
-:: Configure agent settings through the IncrediBuild settings file
-echo Configuring agent settings through registry...
-
-:: Get the available solution configurations
-echo Reading available solution configurations...
-set "CONFIG_FILE=%TEMP%\ib_solution_configs.txt"
-BuildConsole "%SOLUTION_FILE%" /showtargets > "%CONFIG_FILE%"
-
-findstr /C:"Available solution configurations:" "%CONFIG_FILE%" > nul
-if %ERRORLEVEL% equ 0 (
-    echo Found configuration information in BuildConsole output.
-    for /f "tokens=1* delims=:" %%a in ('findstr /C:"Available solution configurations:" "%CONFIG_FILE%"') do (
-        set "AVAILABLE_CONFIGS=%%b"
-    )
-    echo Available configurations:%AVAILABLE_CONFIGS%
-) else (
-    echo Could not determine available solution configurations.
-    echo Defaulting to standard configurations.
-    set "AVAILABLE_CONFIGS=    Debug|Any CPU    Release|Any CPU    Debug|x86    Release|x86"
-)
-
-:: Display build agent statistics
+:: Display available agents
 echo.
 echo ===============================================
-echo Incredibuild Agent Information
+echo IncrediBuild Agents
 echo ===============================================
-ibconsole /command="GetHelpers"
+IBConsole /command=GetHelpers
+
+:: Query available solution configurations
+echo.
+echo Getting available solution configurations...
+BuildConsole "%SOLUTION_FILE%" /showtargets > "%TEMP%\solution_configs.txt"
+
+:: Parse available solution configurations
+type "%TEMP%\solution_configs.txt" | findstr /C:"Available solution configurations:"
+for /f "tokens=1* delims=:" %%a in ('findstr /C:"Available solution configurations:" "%TEMP%\solution_configs.txt"') do (
+    set "AVAILABLE_CONFIGS=%%b"
+)
+
+:: Display available solution configurations
+echo.
+echo Available configurations: %AVAILABLE_CONFIGS%
 
 echo.
 echo ===============================================
@@ -139,28 +119,32 @@ echo Build Options
 echo ===============================================
 echo 1. Release build (Any CPU)
 echo 2. Debug build (Any CPU)
-echo 3. Release build (x86)
-echo 4. Debug build (x86)
-echo 5. Clean solution
-echo 6. Build specific module
+echo 3. Release build (ARM64)
+echo 4. Debug build (ARM64)
+echo 5. Release build (x86)
+echo 6. Debug build (x86)
+echo 7. Clean solution
+echo 8. Build specific module
 echo.
 
-choice /C 123456 /N /M "Select a build option [1-6]: "
+choice /C 12345678 /N /M "Select a build option [1-8]: "
 
 if %ERRORLEVEL% EQU 1 set "BUILD_CONFIG=Release|Any CPU"
 if %ERRORLEVEL% EQU 2 set "BUILD_CONFIG=Debug|Any CPU"
-if %ERRORLEVEL% EQU 3 set "BUILD_CONFIG=Release|x86"
-if %ERRORLEVEL% EQU 4 set "BUILD_CONFIG=Debug|x86"
-if %ERRORLEVEL% EQU 5 goto clean_solution
-if %ERRORLEVEL% EQU 6 goto build_module
+if %ERRORLEVEL% EQU 3 set "BUILD_CONFIG=Release|ARM64"
+if %ERRORLEVEL% EQU 4 set "BUILD_CONFIG=Debug|ARM64"
+if %ERRORLEVEL% EQU 5 set "BUILD_CONFIG=Release|x86"
+if %ERRORLEVEL% EQU 6 set "BUILD_CONFIG=Debug|x86"
+if %ERRORLEVEL% EQU 7 goto clean_solution
+if %ERRORLEVEL% EQU 8 goto build_module
 
 echo.
 echo Starting build with configuration: %BUILD_CONFIG%
 echo.
 
-:: Build solution with Incredibuild using XML profile
-echo Building solution with Incredibuild...
-BuildConsole "%SOLUTION_FILE%" /build /cfg="%BUILD_CONFIG%" /useenv /prefs=IncrediBuildFilePrefs /out="%BUILD_LOG%" /MaxCPUs=16
+:: Build solution with IncrediBuild
+echo Building solution with IncrediBuild...
+BuildConsole "%SOLUTION_FILE%" /build /cfg="%BUILD_CONFIG%" /useenv /out="%BUILD_LOG%" /MaxCPUs=16
 
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Build failed. Check the log file at %BUILD_LOG% for details.
@@ -193,16 +177,20 @@ echo Cleaning solution...
 echo Select configuration to clean:
 echo 1. Release|Any CPU
 echo 2. Debug|Any CPU
-echo 3. Release|x86
-echo 4. Debug|x86
+echo 3. Release|ARM64
+echo 4. Debug|ARM64
+echo 5. Release|x86
+echo 6. Debug|x86
 echo.
 
-choice /C 1234 /N /M "Select configuration [1-4]: "
+choice /C 123456 /N /M "Select configuration [1-6]: "
 
 if %ERRORLEVEL% EQU 1 set "CLEAN_CONFIG=Release|Any CPU"
 if %ERRORLEVEL% EQU 2 set "CLEAN_CONFIG=Debug|Any CPU"
-if %ERRORLEVEL% EQU 3 set "CLEAN_CONFIG=Release|x86"
-if %ERRORLEVEL% EQU 4 set "CLEAN_CONFIG=Debug|x86"
+if %ERRORLEVEL% EQU 3 set "CLEAN_CONFIG=Release|ARM64"
+if %ERRORLEVEL% EQU 4 set "CLEAN_CONFIG=Debug|ARM64"
+if %ERRORLEVEL% EQU 5 set "CLEAN_CONFIG=Release|x86"
+if %ERRORLEVEL% EQU 6 set "CLEAN_CONFIG=Debug|x86"
 
 BuildConsole "%SOLUTION_FILE%" /clean /cfg="%CLEAN_CONFIG%" /useenv /out="%BUILD_LOG%"
 echo Solution cleaned. Log file: %BUILD_LOG%
@@ -248,16 +236,20 @@ echo.
 echo Select build configuration:
 echo 1. Release|Any CPU
 echo 2. Debug|Any CPU
-echo 3. Release|x86
-echo 4. Debug|x86
+echo 3. Release|ARM64
+echo 4. Debug|ARM64
+echo 5. Release|x86
+echo 6. Debug|x86
 echo.
 
-choice /C 1234 /N /M "Select configuration [1-4]: "
+choice /C 123456 /N /M "Select configuration [1-6]: "
 
 if %ERRORLEVEL% EQU 1 set "MODULE_CONFIG=Release|Any CPU"
 if %ERRORLEVEL% EQU 2 set "MODULE_CONFIG=Debug|Any CPU"
-if %ERRORLEVEL% EQU 3 set "MODULE_CONFIG=Release|x86"
-if %ERRORLEVEL% EQU 4 set "MODULE_CONFIG=Debug|x86"
+if %ERRORLEVEL% EQU 3 set "MODULE_CONFIG=Release|ARM64"
+if %ERRORLEVEL% EQU 4 set "MODULE_CONFIG=Debug|ARM64"
+if %ERRORLEVEL% EQU 5 set "MODULE_CONFIG=Release|x86"
+if %ERRORLEVEL% EQU 6 set "MODULE_CONFIG=Debug|x86"
 
 echo Building module with configuration: %MODULE_CONFIG%
 BuildConsole "%PROJECT_FILE%" /build /cfg="%MODULE_CONFIG%" /useenv /out="%BUILD_LOG%"
@@ -309,6 +301,7 @@ if %FOUND_PROJECTS% EQU 0 (
 )
 
 :end
+:: Display build completion message
 echo.
 echo ===============================================
 echo Build process complete
