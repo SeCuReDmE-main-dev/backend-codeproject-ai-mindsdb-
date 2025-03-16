@@ -14,22 +14,26 @@ This project is a mini app built using the duo server side CodeProject AI server
 ### Setting up the CodeProject AI Server
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/githubnext/workspace-blank.git
-   cd workspace-blank
+   git clone https://github.com/your-username/mini-app-codeproject-ai-mindsdb.git
    ```
 
 2. Navigate to the `server` directory:
+
+   ```bash
    ```bash
    cd server
    ```
 
 3. Install the required dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. Run the CodeProject AI server:
+
    ```bash
    python codeproject_ai_server.py
    ```
@@ -37,16 +41,19 @@ This project is a mini app built using the duo server side CodeProject AI server
 ### Setting up the MindsDB Server
 
 1. Navigate to the `server` directory:
+
    ```bash
    cd server
    ```
 
 2. Install the required dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. Run the MindsDB server:
+
    ```bash
    python mindsdb_server.py
    ```
@@ -54,11 +61,13 @@ This project is a mini app built using the duo server side CodeProject AI server
 ### Setting up the Shared Central Database
 
 1. Navigate to the `server` directory:
+
    ```bash
    cd server
    ```
 
 2. Run the database setup script:
+
    ```bash
    python database_setup.py
    ```
@@ -66,16 +75,19 @@ This project is a mini app built using the duo server side CodeProject AI server
 ### Setting up a Conda Environment
 
 1. Create a conda environment:
+
    ```bash
    conda create --name myenv python=3.8
    ```
 
 2. Activate the conda environment:
+
    ```bash
    conda activate myenv
    ```
 
 3. Install the required dependencies using `pip` within the conda environment:
+
    ```bash
    pip install -r server/requirements.txt
    pip install -r client/requirements.txt
@@ -86,11 +98,13 @@ This project is a mini app built using the duo server side CodeProject AI server
 1. Start the CodeProject AI server and MindsDB server as described in the installation instructions.
 
 2. Navigate to the `client` directory:
+
    ```bash
    cd client
    ```
 
 3. Install the required dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
