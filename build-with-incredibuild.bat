@@ -62,9 +62,9 @@ echo ===============================================
 echo Configuring IncrediBuild Agent Settings
 echo ===============================================
 
-:: Disable standalone mode - Note: must be run as administrator
+:: Disable standalone mode - Fixed command format
 echo Disabling standalone mode...
-BuildConsole /STANDALONE=Disable
+"%PROGRAMFILES(X86)%\IncrediBuild\IncrediBuild.exe" /Standalone=Disable
 
 :: Set coordinator in registry directly using reg.exe (requires admin)
 echo Setting coordinator ID...
@@ -76,17 +76,17 @@ net stop "IncrediBuild Agent" >nul 2>&1
 net start "IncrediBuild Agent" >nul 2>&1
 timeout /t 5 /nobreak >nul
 
-:: Configure system resource allocation
+:: Configure system resource allocation - Fixed command format
 echo Configuring system resource allocation...
-BuildConsole /AGENT /MaxCPUS=80
-BuildConsole /AGENT /UseMultiCores=1
+"%PROGRAMFILES(X86)%\IncrediBuild\IncrediBuild.exe" /Settings /MaxCores=16
+"%PROGRAMFILES(X86)%\IncrediBuild\IncrediBuild.exe" /Settings /AvoidLocal=0
 
-:: Display agent information
+:: Display agent information - Fixed command format
 echo.
 echo ===============================================
 echo IncrediBuild Agent Information
 echo ===============================================
-BuildConsole /SHOWAGENT
+"%PROGRAMFILES(X86)%\IncrediBuild\IncrediBuild.exe" /GetAgents
 
 :: Create needed directories if they don't exist
 if not exist "%MODULES_DIR%" mkdir "%MODULES_DIR%"
@@ -122,7 +122,7 @@ if %ERRORLEVEL% EQU 7 (
 if %ERRORLEVEL% EQU 8 goto build_module
 if %ERRORLEVEL% EQU 9 goto build_mindsdb
 
-:: Build the solution
+:: Build the solution - Fixed BuildConsole command format
 echo Building solution with configuration: %BUILD_CONFIG%
 BuildConsole "%SOLUTION_FILE%" /cfg="%BUILD_CONFIG%" /ShowTime /ShowAgent /Retry=3
 
@@ -192,6 +192,8 @@ goto keep_window_open
 :build_all_modules
 echo Building all modules...
 
+setlocal enabledelayedexpansion
+
 for %%m in (SentimentAnalysis PortraitFilter) do (
     set "MODULE_DIR=%MODULES_DIR%\CodeProject.AI-%%m"
     set "PROJECT_FILE=!MODULE_DIR!\%%m.csproj"
@@ -214,6 +216,8 @@ for %%m in (SentimentAnalysis PortraitFilter) do (
     echo Building module: %%m
     BuildConsole "!PROJECT_FILE!" /cfg="Release|Any CPU" /ShowTime /ShowAgent
 )
+
+endlocal
 
 :: Build MultiModeLLM separately as it's in a different directory
 set "MODULE_DIR=%ROOT_DIR%\CodeProject.AI-MultiModeLLM"
@@ -242,6 +246,25 @@ goto keep_window_open
 :build_mindsdb
 echo.
 echo Building MindsDB integration...
+
+:: Kill any processes using the required ports before running start_integration
+echo Checking for processes using MindsDB ports...
+for %%p in (6000 6001 6002 47334 27017) do (
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":%%p.*LISTENING"') do (
+        echo Found process using port %%p with PID %%a, attempting to terminate...
+        taskkill /F /PID %%a >nul 2>&1
+        if !ERRORLEVEL! equ 0 (
+            echo Successfully freed port %%p
+        ) else (
+            echo Failed to free port %%p, the integration may fail to start properly.
+        )
+    )
+)
+
+:: Wait a moment for ports to be freed
+timeout /t 2 /nobreak >nul
+
+:: Now run start_integration
 cd /d "%ROOT_DIR%\mini-app-codeproject-ai-mindsdb"
 call start_integration.bat
 goto keep_window_open
