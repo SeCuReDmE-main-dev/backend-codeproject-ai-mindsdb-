@@ -69,7 +69,7 @@ def create_mongodb_connection():
         print(f"Error connecting to MongoDB database: {e}")
         yield None
     finally:
-        if client:
+        if client is not None:
             client.close()
 
 @contextmanager
