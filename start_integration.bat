@@ -109,9 +109,27 @@ echo } > "%MINDSDB_CONFIG_FILE%"
 
 echo Configuration file created at: %MINDSDB_CONFIG_FILE%
 
-:: Start MindsDB with the configuration file
+:: Start MindsDB with the configuration file - Added error handling
 echo Starting MindsDB Server on port 47334...
-cd /d "%MINDSDB_CONFIG_DIR%" && python -m mindsdb --config="%MINDSDB_CONFIG_FILE%"
+cd /d "%MINDSDB_CONFIG_DIR%" || (
+    echo ERROR: Failed to change directory to %MINDSDB_CONFIG_DIR%
+    echo.
+    echo Press any key to exit...
+    pause > nul
+    exit /b 1
+)
+
+:: Run MindsDB with error handling
+python -m mindsdb --config="%MINDSDB_CONFIG_FILE%"
+if !ERRORLEVEL! neq 0 (
+    echo.
+    echo ERROR: MindsDB failed to start properly with exit code !ERRORLEVEL!
+    echo Please check the error messages above for more details.
+    echo.
+    echo Press any key to exit...
+    pause > nul
+    exit /b 1
+)
 
 echo.
 echo Integration services started successfully!
@@ -121,6 +139,9 @@ echo - MindsDB is running on http://localhost:47334
 echo - MongoDB is connected to %MONGODB_URI%
 echo.
 echo Press Ctrl+C in each terminal window to stop the services.
+echo.
+echo Press any key to exit the launcher...
+pause > nul
 exit /b 0
 
 :free_port
@@ -293,7 +314,7 @@ if %ERRORLEVEL% EQU 6 goto start_portrait
 if %ERRORLEVEL% EQU 7 goto start_multimodellm
 if %ERRORLEVEL% EQU 8 goto start_all_hubs
 if %ERRORLEVEL% EQU 9 goto start_all
-if %ERRORLEVEL% EQU 0 goto end
+if %ERRORLEVEL% EQU 10 goto end
 
 :verify_service
 :: Usage: call :verify_service <port> <service_name>
@@ -319,15 +340,19 @@ if !errorlevel! equ 1 (
         call :kill_process_on_port %port%
         if !errorlevel! equ 1 (
             echo Failed to free port %port%. Please resolve manually.
+            echo Press any key to continue...
+            pause >nul
             goto error_exit
         )
     ) else (
         echo Cannot start %service_name% - port %port% is in use
+        echo Press any key to continue...
+        pause >nul
         goto error_exit
     )
 )
 
-start cmd /k "%command%"
+start cmd /k "title %service_name% & %command% || (echo. & echo ERROR: %service_name% failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 call :verify_service %port% "%service_name%"
 exit /b 0
 
@@ -358,19 +383,19 @@ goto end
 :start_sentiment
 echo.
 echo Starting SentimentAnalysis Module...
-start cmd /k "cd /d %SENTIMENT_MODULE% && dotnet run"
+start cmd /k "title Sentiment Analysis Module & cd /d %SENTIMENT_MODULE% && dotnet run || (echo. & echo ERROR: Sentiment Analysis Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 goto end
 
 :start_portrait
 echo.
 echo Starting PortraitFilter Module...
-start cmd /k "cd /d %PORTRAIT_MODULE% && dotnet run"
+start cmd /k "title Portrait Filter Module & cd /d %PORTRAIT_MODULE% && dotnet run || (echo. & echo ERROR: Portrait Filter Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 goto end
 
 :start_multimodellm
 echo.
 echo Starting MultiModeLLM Module...
-start cmd /k "cd /d %MULTIMODELLM_MODULE% && dotnet run"
+start cmd /k "title MultiModeLLM Module & cd /d %MULTIMODELLM_MODULE% && dotnet run || (echo. & echo ERROR: MultiModeLLM Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 goto end
 
 :start_all_hubs
@@ -405,15 +430,15 @@ echo 4. Starting App MindsDB Server...
 call :verify_and_start_service %APP_MINDSDB_PORT% "App MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
 
 echo 5. Starting SentimentAnalysis Module...
-start cmd /k "cd /d %SENTIMENT_MODULE% && dotnet run"
+start cmd /k "title Sentiment Analysis Module & cd /d %SENTIMENT_MODULE% && dotnet run || (echo. & echo ERROR: Sentiment Analysis Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 timeout /t 3 >nul
 
 echo 6. Starting PortraitFilter Module...
-start cmd /k "cd /d %PORTRAIT_MODULE% && dotnet run"
+start cmd /k "title Portrait Filter Module & cd /d %PORTRAIT_MODULE% && dotnet run || (echo. & echo ERROR: Portrait Filter Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 timeout /t 3 >nul
 
 echo 7. Starting MultiModeLLM Module...
-start cmd /k "cd /d %MULTIMODELLM_MODULE% && dotnet run"
+start cmd /k "title MultiModeLLM Module & cd /d %MULTIMODELLM_MODULE% && dotnet run || (echo. & echo ERROR: MultiModeLLM Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
 
 echo.
 echo All components started successfully!
@@ -422,6 +447,7 @@ goto end
 
 :error_exit
 echo.
+echo An error occurred during integration startup.
 echo Press any key to exit...
 pause >nul
 exit /b 1
@@ -432,6 +458,10 @@ echo Press any key to exit the launcher...
 pause >nul
 exit /b 0
 
-:: Pause to keep the terminal open
-pause
+:: Added final pause to ensure window stays open even if errors occur
+echo.
+echo Integration process completed. Check individual windows for any errors.
+echo.
+echo Press any key to exit...
+pause >nul
 exit /b 0
