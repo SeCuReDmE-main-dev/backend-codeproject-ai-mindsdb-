@@ -10,24 +10,94 @@ setlocal EnableDelayedExpansion
 :: Make sure this window stays open even if errors occur
 set "KEEP_WINDOW_OPEN=1"
 
-:: Check for IncrediBuild installation
-echo ===============================================
-echo IncrediBuild Agent Information
-echo ===============================================
-set "INCREDIBUILD_PATH=C:\Program Files (x86)\IncrediBuild\IncrediBuild.exe"
-set "USE_INCREDIBUILD=0"
+:: Set paths first to ensure proper ordering
+set "ROOT_DIR=%~dp0.."
+set "BASE_DIR=%~dp0"
+set "SERVER_DIR=%ROOT_DIR%\CodeProject.AI-Server"
+set "SERVER_SRC=%SERVER_DIR%\src\server"
+set "MINDSDB_DIR=%BASE_DIR%\MindsDB"
+set "APP_SERVER_DIR=%BASE_DIR%\server"
+set "NEURAL_DIR=%BASE_DIR%\neural_forecast"
+set "SENNNT_DIR=%SERVER_DIR%\modules\SenNnT-i"
 
-if exist "%INCREDIBUILD_PATH%" (
-    set "USE_INCREDIBUILD=1"
-    echo IncrediBuild found at: %INCREDIBUILD_PATH%
+echo Using custom modules path: %MODULE_PATH%
+if exist "%MODULE_PATH%" (
+    echo Custom modules directory found.
+    echo Available modules:
+    dir /b "%MODULE_PATH%" 2>nul
 ) else (
-    echo WARNING: IncrediBuild not found at %INCREDIBUILD_PATH%
-    echo The integration will continue without IncrediBuild acceleration.
-    echo.
+    echo WARNING: Custom modules directory not found at %MODULE_PATH%
+    echo Creating directory...
+    mkdir "%MODULE_PATH%"
+)
+
+:: Create requirements.txt in the expected directory if it doesn't exist
+set "SERVER_REQUIREMENTS=%SERVER_DIR%\src\server\requirements.txt"
+if not exist "%SERVER_DIR%\src\server" (
+    mkdir "%SERVER_DIR%\src\server"
+)
+
+echo Creating requirements.txt file at %SERVER_REQUIREMENTS%...
+(
+echo fastapi==0.96.0
+echo numpy==1.23.5
+echo opencv-python==4.6.0.66
+echo pillow==9.5.0
+echo pydantic==1.10.8
+echo python-multipart==0.0.6
+echo uvicorn==0.22.0
+echo mindsdb
+echo flask
+echo pandas
+echo tensorflow
+echo scikit-learn
+echo matplotlib
+echo imutils
+) > "%SERVER_REQUIREMENTS%"
+echo Requirements file created.
+
+:: Create SenNnT-i module directory and configuration if needed
+if not exist "%SENNNT_DIR%" (
+    mkdir "%SENNNT_DIR%"
+    echo Creating SenNnT-i module configuration...
+    
+    :: Create modulesettings.json
+    echo {> "%SENNNT_DIR%\modulesettings.json"
+    echo   "moduleName": "SenNnT-i Neural Network",>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "moduleVersion": "1.0.0",>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "moduleDescription": "Neural network forecasting module for SeCuReDmE",>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "modulePlatforms": ["windows"],>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "moduleIsBeta": false,>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "moduleIsInternal": true,>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "modulePythonVersion": "3.9",>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "moduleEntryPoint": "sennnt_adapter.py",>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "installGPU": true,>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "runtime": "python3.9",>> "%SENNNT_DIR%\modulesettings.json"
+    echo   "runtimeLocation": "Local">> "%SENNNT_DIR%\modulesettings.json"
+    echo }>> "%SENNNT_DIR%\modulesettings.json"
+    
+    echo SenNnT-i module configuration created.
 )
 
 :: Define required ports
 set "REQUIRED_PORTS=6000 6001 6002 47334 27017"
+
+:: Check for requirements file and create it if it doesn't exist
+set "REQUIREMENTS_PATH=%ROOT_DIR%\CodeProject.AI-Server\src\server\requirements.txt"
+set "CUSTOM_REQUIREMENTS_PATH=%BASE_DIR%\custom_requirements.txt"
+
+:: Create custom requirements file if it doesn't exist
+if not exist "%CUSTOM_REQUIREMENTS_PATH%" (
+    echo Creating custom requirements file...
+    echo mindsdb> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo flask>> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo pandas>> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo numpy>> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo scikit-learn>> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo matplotlib>> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo tensorflow>> "%CUSTOM_REQUIREMENTS_PATH%"
+    echo Your custom packages added to: %CUSTOM_REQUIREMENTS_PATH%
+)
 
 :: Function to check if a port is in use and kill the process
 :check_and_free_port
@@ -65,26 +135,21 @@ set "MONGODB_DATABASE=minds"
 echo Using MongoDB connection: %MONGODB_URI%
 echo Database: %MONGODB_DATABASE%
 
-:: Set paths
-set "ROOT_DIR=%~dp0.."
-set "BASE_DIR=%~dp0"
-set "SERVER_DIR=%ROOT_DIR%\CodeProject.AI-Server"
-set "SERVER_SRC=%SERVER_DIR%\src\server"
-set "MINDSDB_DIR=%BASE_DIR%\MindsDB"
-set "APP_SERVER_DIR=%BASE_DIR%\server"
-set "NEURAL_DIR=%BASE_DIR%\neural_forecast"
-
+:: Install custom requirements
 echo.
 echo ===============================================
-echo Initializing Neural Environment
+echo Installing custom requirements
 echo ===============================================
 echo.
-
-:: Initialize neural environment
-cd /d "%NEURAL_DIR%"
-call init_neural_env.bat
-if %ERRORLEVEL% neq 0 (
-    echo WARNING: Failed to initialize neural environment.
+call conda activate SeCuReDmE_env
+if exist "%CUSTOM_REQUIREMENTS_PATH%" (
+    echo Installing packages from %CUSTOM_REQUIREMENTS_PATH%...
+    pip install -r "%CUSTOM_REQUIREMENTS_PATH%"
+) else (
+    echo WARNING: Custom requirements file not found at %CUSTOM_REQUIREMENTS_PATH%
+    echo Installing essential packages...
+    pip install mindsdb flask pandas numpy
+)
     echo The integration may not work properly.
     echo Trying to continue anyway...
 )
@@ -133,6 +198,36 @@ echo     }>> "%MINDSDB_CONFIG_FILE%"
 echo }>> "%MINDSDB_CONFIG_FILE%"
 
 echo Configuration file created at: %MINDSDB_CONFIG_FILE%
+
+echo.
+echo ===============================================
+echo Configuring API Integration
+echo ===============================================
+echo.
+
+set "API_CONFIG_FILE=%APP_SERVER_DIR%\config.json"
+if not exist "%APP_SERVER_DIR%" (
+    mkdir "%APP_SERVER_DIR%"
+)
+
+echo Creating API configuration file...
+echo {> "%API_CONFIG_FILE%"
+echo   "codeproject_ai_server": {>> "%API_CONFIG_FILE%"
+echo     "host": "localhost",>> "%API_CONFIG_FILE%"
+echo     "port": 5000,>> "%API_CONFIG_FILE%"
+echo     "api_key": "">> "%API_CONFIG_FILE%"
+echo   },>> "%API_CONFIG_FILE%"
+echo   "mindsdb": {>> "%API_CONFIG_FILE%"
+echo     "host": "localhost",>> "%API_CONFIG_FILE%"
+echo     "port": 47334,>> "%API_CONFIG_FILE%"
+echo     "mongodb_port": 27017>> "%API_CONFIG_FILE%"
+echo   },>> "%API_CONFIG_FILE%"
+echo   "model_paths": {>> "%API_CONFIG_FILE%"
+echo     "neural_forecast": "%NEURAL_DIR:\=\\%\\models">> "%API_CONFIG_FILE%"
+echo   }>> "%API_CONFIG_FILE%"
+echo }>> "%API_CONFIG_FILE%"
+
+echo API configuration complete.
 
 echo.
 echo ===============================================
