@@ -13,7 +13,7 @@
             "port": 27017,
             "database": "mindsdb",
             "user": "securedme_admin",
-            "password": "${MONGODB_ATLAS_PASSWORD}",
+            "password": "",
             "type": "mongodb",
             "federation": {
                 "enabled": true,
@@ -24,7 +24,7 @@
         "codeproject_ai": {
             "enabled": true,
             "host": "127.0.0.1",
-            "port": 6000
+            "port": 32168
         }
     },
     "interface": {

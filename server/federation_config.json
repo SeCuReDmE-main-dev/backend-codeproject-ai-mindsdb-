@@ -1,65 +1,16 @@
 {
-    "name": "minds",
-    "type": "federated",
-    "stores": [
-        {
-            "name": "neural_network",
-            "provider": "s3",
-            "region": "us-east-1",
-            "prefix": "/neural_network/",
-            "delimiter": "/",
-            "include": ["*.json"]
-        },
-        {
-            "name": "mflix",
-            "provider": "s3",
-            "region": "us-east-1",
-            "prefix": "/mflix/",
-            "delimiter": "/",
-            "include": ["*.json"]
-        }
-    ],
-    "databases": [
-        {
-            "name": "minds",
-            "collections": [
-                {
-                    "name": "Sessions",
-                    "dataSources": [
-                        {
-                            "store": "mflix",
-                            "path": "/sessions.json"
-                        }
-                    ]
-                },
-                {
-                    "name": "Users",
-                    "dataSources": [
-                        {
-                            "store": "mflix",
-                            "path": "/users.json"
-                        }
-                    ]
-                },
-                {
-                    "name": "Models",
-                    "dataSources": [
-                        {
-                            "store": "neural_network",
-                            "path": "/models.json"
-                        }
-                    ]
-                },
-                {
-                    "name": "TrainingData",
-                    "dataSources": [
-                        {
-                            "store": "neural_network",
-                            "path": "/training_data.json"
-                        }
-                    ]
-                }
-            ]
-        }
+  "securedme_datasource": {
+    "type": "mongodb",
+    "connection": {
+      "host": "mongodb+srv://securedme_admin:*******@atlas-sql-67784fb49d4ee405eb7f6fca-d33ve.a.query.mongodb.net",
+      "database": "mindsdb"
+    },
+    "enabled": true,
+    "tables": [
+      "users",
+      "predictions",
+      "sensor_data",
+      "security_events"
     ]
+  }
 }
