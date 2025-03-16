@@ -161,3 +161,112 @@ if __name__ == '__main__':
         if not os.path.exists('shared_central_database.db'):
             db.create_all()
         app.run(host='0.0.0.0', port=5002)
+
+import os
+import sys
+import json
+import logging
+import mindsdb
+from mindsdb.api.http.start import start as start_mindsdb
+from logging.handlers import RotatingFileHandler
+
+# Setup logging
+logger = logging.getLogger("mindsdb_server")
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Console handler
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+# File handler with rotation
+file_handler = RotatingFileHandler('mindsdb_server.log', maxBytes=10485760, backupCount=5)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+class MindsDBServer:
+    def __init__(self, config_path=None):
+        self.config = self._load_config(config_path)
+        self.mindsdb_config = self._load_mindsdb_config()
+        self.federation_config = self._load_federation_config()
+        
+    def _load_config(self, config_path):
+        """Load main application config"""
+        if config_path is None:
+            config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.json')
+        
+        try:
+            with open(config_path, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.error(f"Config file not found: {config_path}")
+            return {
+                "mindsdb_server": {
+                    "host": "localhost",
+                    "port": 47335
+                }
+            }
+        except json.JSONDecodeError:
+            logger.error(f"Invalid JSON in config file: {config_path}")
+            return {
+                "mindsdb_server": {
+                    "host": "localhost",
+                    "port": 47335
+                }
+            }
+    
+    def _load_mindsdb_config(self):
+        """Load MindsDB configuration"""
+        mindsdb_config_path = os.path.join(os.path.dirname(__file__), 'mindsdb.json')
+        try:
+            with open(mindsdb_config_path, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.warning(f"MindsDB config file not found: {mindsdb_config_path}. Using default settings.")
+            return None
+        except json.JSONDecodeError:
+            logger.error(f"Invalid JSON in MindsDB config file: {mindsdb_config_path}")
+            return None
+    
+    def _load_federation_config(self):
+        """Load federation configuration"""
+        federation_config_path = os.path.join(os.path.dirname(__file__), 'federation_config.json')
+        try:
+            with open(federation_config_path, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.warning(f"Federation config file not found: {federation_config_path}. Using default settings.")
+            return None
+        except json.JSONDecodeError:
+            logger.error(f"Invalid JSON in federation config file: {federation_config_path}")
+            return None
+    
+    def start(self):
+        """Start the MindsDB server"""
+        logger.info("Starting MindsDB server...")
+        
+        try:
+            # Configure MindsDB with our settings
+            if self.mindsdb_config:
+                mindsdb_config_dir = os.path.dirname(__file__)
+                os.environ['MINDSDB_CONFIG_PATH'] = mindsdb_config_dir
+                logger.info(f"Using MindsDB config from: {mindsdb_config_dir}")
+            
+            # Start MindsDB server
+            mindsdb_port = self.config["mindsdb_server"]["port"]
+            mindsdb_host = self.config["mindsdb_server"]["host"]
+            logger.info(f"Starting MindsDB on {mindsdb_host}:{mindsdb_port}")
+            
+            # Start MindsDB HTTP API server
+            start_mindsdb(verbose=False, api_host=mindsdb_host, api_port=mindsdb_port)
+            
+            logger.info("MindsDB server started successfully")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to start MindsDB server: {str(e)}")
+            return False
+
+if __name__ == "__main__":
+    server = MindsDBServer()
+    server.start()
