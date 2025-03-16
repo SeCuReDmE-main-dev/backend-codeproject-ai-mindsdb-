@@ -8,7 +8,7 @@ echo.
 setlocal EnableDelayedExpansion
 
 :: Define required ports
-set "REQUIRED_PORTS=6000 6001 6002 47334"
+set "REQUIRED_PORTS=6000 6001 6002 47334 27017"
 set "PORT_IN_USE=0"
 
 :: Check all required ports first
@@ -40,6 +40,17 @@ if "%PORT_IN_USE%"=="1" (
     echo All required ports are available.
 )
 
+:: MongoDB Connection Configuration
+echo.
+echo ===============================================
+echo MongoDB Connection Settings
+echo ===============================================
+set "MONGODB_URI=mongodb+srv://sennnti:YOUR_PASSWORD_HERE@minds.d33ve.mongodb.net/"
+set "MONGODB_DATABASE=minds"
+
+echo Using MongoDB connection: %MONGODB_URI%
+echo Database: %MONGODB_DATABASE%
+
 echo.
 echo ===============================================
 echo Starting CodeProject AI Server...
@@ -54,15 +65,52 @@ echo ===============================================
 echo Starting MindsDB Server...
 echo ===============================================
 
-:: Add your MindsDB startup code here
+:: Create MindsDB configuration file with MongoDB connection
+echo Creating MindsDB configuration...
+
+set "MINDSDB_CONFIG_DIR=%~dp0MindsDB"
+set "MINDSDB_CONFIG_FILE=%MINDSDB_CONFIG_DIR%\config.json"
+
+echo {
+echo     "api": {
+echo         "http": {
+echo             "host": "127.0.0.1",
+echo             "port": "47334"
+echo         },
+echo         "mongodb": {
+echo             "host": "127.0.0.1",
+echo             "port": "27017"
+echo         }
+echo     },
+echo     "storage_dir": "./storage",
+echo     "integrations": {
+echo         "mongodb_atlas": {
+echo             "enabled": true,
+echo             "host": "minds.d33ve.mongodb.net",
+echo             "port": 27017,
+echo             "database": "%MONGODB_DATABASE%",
+echo             "type": "mongodb",
+echo             "federation": {
+echo                 "enabled": true,
+echo                 "sql_api": true,
+echo                 "federated_database": "%MONGODB_DATABASE%"
+echo             }
+echo         }
+echo     }
+echo } > "%MINDSDB_CONFIG_FILE%"
+
+echo Configuration file created at: %MINDSDB_CONFIG_FILE%
+
+:: Start MindsDB with the configuration file
 echo Starting MindsDB Server on port 47334...
-:: Example: cd path\to\mindsdb && start python -m mindsdb
+cd /d "%MINDSDB_CONFIG_DIR%" && python -m mindsdb --config="%MINDSDB_CONFIG_FILE%"
 
 echo.
 echo Integration services started successfully!
 echo.
 echo - CodeProject AI is running on http://localhost:6000
 echo - MindsDB is running on http://localhost:47334
+echo - MongoDB is connected to %MONGODB_URI%
 echo.
 echo Press Ctrl+C in each terminal window to stop the services.
 exit /b 0
