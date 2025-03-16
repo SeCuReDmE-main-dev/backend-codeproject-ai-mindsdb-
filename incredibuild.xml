@@ -79,7 +79,7 @@
       <Variable Name="DOTNET_CLI_HOME" Value="%USERPROFILE%" />
     </Environment>
     
-    <!-- Output settings - Fixed tag name from 'o' to 'Output' -->
+    <!-- Output settings -->
     <Output>
       <!-- Enable detailed output for build logs -->
       <VerbosityLevel>Normal</VerbosityLevel>
