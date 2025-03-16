@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <BuildConsole>
   <Profile>
-    <ProfileName>CodeProject AI-MindsDB Build</ProfileName>
+    <ProfileName>SeCuReDmE CodeProject.AI Build</ProfileName>
     <!-- Set to 0 for automatic core allocation -->
     <MaxCores>0</MaxCores>
     <!-- Number of local cores to use (4 is a good default) -->
     <MaxCoresLocal>4</MaxCoresLocal>
     <AvoidLocalExecution>false</AvoidLocalExecution>
     <CopyFilesToCoordinator>false</CopyFilesToCoordinator>
+    <CopyFilesFromCoordinator>false</CopyFilesFromCoordinator>
     <AvoidNetworkAccess>false</AvoidNetworkAccess>
     
     <!-- Agent specific settings -->
@@ -79,7 +80,7 @@
     </Environment>
     
     <!-- Output settings -->
-    <Output>
+    <OutputSettings>
       <!-- Enable detailed output for build logs -->
       <VerbosityLevel>Normal</VerbosityLevel>
       <!-- Show warnings -->
@@ -88,7 +89,7 @@
       <ShowErrors>true</ShowErrors>
       <!-- Color output -->
       <ColorOutput>true</ColorOutput>
-    </Output>
+    </OutputSettings>
     
     <!-- Logging Settings -->
     <Logging>
