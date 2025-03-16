@@ -7,6 +7,10 @@ echo.
 :: Setup environment
 setlocal EnableDelayedExpansion
 
+:: Make sure this window stays open even if errors occur
+:: Set this flag at the very beginning to ensure it's always set
+set "KEEP_WINDOW_OPEN=1"
+
 :: Define required ports
 set "REQUIRED_PORTS=6000 6001 6002 47334 27017"
 set "PORT_IN_USE=0"
@@ -40,9 +44,7 @@ if "%PORT_IN_USE%"=="1" (
     ) else (
         echo.
         echo Please close the applications using these ports and try again.
-        echo Press any key to exit...
-        pause > nul
-        exit /b 1
+        goto keep_window_open
     )
 ) else (
     echo All required ports are available.
@@ -109,40 +111,39 @@ echo } > "%MINDSDB_CONFIG_FILE%"
 
 echo Configuration file created at: %MINDSDB_CONFIG_FILE%
 
-:: Start MindsDB with the configuration file - Added error handling
+:: Start MindsDB with the configuration file - Modified for better error handling
 echo Starting MindsDB Server on port 47334...
 cd /d "%MINDSDB_CONFIG_DIR%" || (
     echo ERROR: Failed to change directory to %MINDSDB_CONFIG_DIR%
     echo.
-    echo Press any key to exit...
-    pause > nul
-    exit /b 1
+    goto keep_window_open
 )
 
-:: Run MindsDB with error handling
-python -m mindsdb --config="%MINDSDB_CONFIG_FILE%"
-if !ERRORLEVEL! neq 0 (
-    echo.
-    echo ERROR: MindsDB failed to start properly with exit code !ERRORLEVEL!
-    echo Please check the error messages above for more details.
-    echo.
-    echo Press any key to exit...
-    pause > nul
-    exit /b 1
-)
+:: Create a separate batch file for MindsDB to run in a persistent window
+set "MINDSDB_BAT=%TEMP%\run_mindsdb_%RANDOM%.bat"
+echo @echo off > "%MINDSDB_BAT%"
+echo title MindsDB Server >> "%MINDSDB_BAT%"
+echo echo Starting MindsDB Server... >> "%MINDSDB_BAT%"
+echo call conda.bat activate SeCuReDmE_env >> "%MINDSDB_BAT%"
+echo python -m mindsdb --config="%MINDSDB_CONFIG_FILE%" >> "%MINDSDB_BAT%"
+echo echo. >> "%MINDSDB_BAT%"
+echo echo =============================================== >> "%MINDSDB_BAT%"
+echo echo MindsDB Server has stopped. >> "%MINDSDB_BAT%"
+echo echo Press any key to close this window... >> "%MINDSDB_BAT%"
+echo pause ^> nul >> "%MINDSDB_BAT%"
+
+:: Launch MindsDB in a separate window that will stay open
+start cmd /k "%MINDSDB_BAT%"
 
 echo.
-echo Integration services started successfully!
+echo Integration services started in separate windows.
 echo.
 echo - CodeProject AI is running on http://localhost:6000
 echo - MindsDB is running on http://localhost:47334
 echo - MongoDB is connected to %MONGODB_URI%
 echo.
-echo Press Ctrl+C in each terminal window to stop the services.
+echo Check the individual windows for error messages.
 echo.
-echo Press any key to exit the launcher...
-pause > nul
-exit /b 0
 
 :free_port
 :: Usage: call :free_port port_number
@@ -171,9 +172,7 @@ dotnet --version >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo ERROR: .NET SDK is not installed or not in PATH.
     echo Please install .NET SDK from https://dotnet.microsoft.com/download
-    echo Press any key to exit...
-    pause > nul
-    exit /b 1
+    goto keep_window_open
 )
 echo .NET SDK found.
 
@@ -183,18 +182,14 @@ where conda >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Conda is not installed or not in PATH.
     echo Please install Conda and try again.
-    echo Press any key to exit...
-    pause > nul
-    exit /b 1
+    goto keep_window_open
 )
 
 call conda.bat activate SeCuReDmE_env
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Failed to activate SeCuReDmE_env Conda environment.
     echo Please ensure the environment is created and properly configured.
-    echo Press any key to exit...
-    pause > nul
-    exit /b 1
+    goto keep_window_open
 )
 echo SeCuReDmE_env activated successfully.
 
@@ -340,19 +335,30 @@ if !errorlevel! equ 1 (
         call :kill_process_on_port %port%
         if !errorlevel! equ 1 (
             echo Failed to free port %port%. Please resolve manually.
-            echo Press any key to continue...
-            pause >nul
-            goto error_exit
+            goto keep_window_open
         )
     ) else (
         echo Cannot start %service_name% - port %port% is in use
-        echo Press any key to continue...
-        pause >nul
-        goto error_exit
+        goto keep_window_open
     )
 )
 
-start cmd /k "title %service_name% & %command% || (echo. & echo ERROR: %service_name% failed to start & echo. & echo Press any key to close this window... & pause >nul)"
+:: Create a batch file for this service to run in a persistent window
+set "SERVICE_BAT=%TEMP%\run_%service_name%_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title %service_name% >> "%SERVICE_BAT%"
+echo echo Starting %service_name%... >> "%SERVICE_BAT%"
+echo %command% >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo =============================================== >> "%SERVICE_BAT%"
+echo echo %service_name% has stopped. >> "%SERVICE_BAT%"
+echo echo Check the output above for any error messages. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+
+:: Launch the service in a separate window that will stay open
+start cmd /k "%SERVICE_BAT%"
+
 call :verify_service %port% "%service_name%"
 exit /b 0
 
@@ -360,43 +366,70 @@ exit /b 0
 echo.
 echo Starting CodeProject AI Server...
 call :verify_and_start_service %CODEPROJECT_PORT% "CodeProject AI Server" "cd /d %SERVER_SRC% && dotnet run"
-goto end
+goto keep_window_open
 
 :start_mindsdb
 echo.
 echo Starting MindsDB Server...
 call :verify_and_start_service %MINDSDB_PORT% "MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %MINDSDB_DIR% && python -m mindsdb --config=%MINDSDB_CONFIG%"
-goto end
+goto keep_window_open
 
 :start_app_codeproject
 echo.
 echo Starting App CodeProject AI Server...
 call :verify_and_start_service %APP_CODEPROJECT_PORT% "App CodeProject AI Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python codeproject_ai_server.py"
-goto end
+goto keep_window_open
 
 :start_app_mindsdb
 echo.
 echo Starting App MindsDB Server...
 call :verify_and_start_service %APP_MINDSDB_PORT% "App MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
-goto end
+goto keep_window_open
 
 :start_sentiment
 echo.
 echo Starting SentimentAnalysis Module...
-start cmd /k "title Sentiment Analysis Module & cd /d %SENTIMENT_MODULE% && dotnet run || (echo. & echo ERROR: Sentiment Analysis Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
-goto end
+set "SERVICE_BAT=%TEMP%\run_sentiment_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title Sentiment Analysis Module >> "%SERVICE_BAT%"
+echo cd /d %SENTIMENT_MODULE% >> "%SERVICE_BAT%"
+echo dotnet run >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo Sentiment Analysis Module has stopped. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+start cmd /k "%SERVICE_BAT%"
+goto keep_window_open
 
 :start_portrait
 echo.
 echo Starting PortraitFilter Module...
-start cmd /k "title Portrait Filter Module & cd /d %PORTRAIT_MODULE% && dotnet run || (echo. & echo ERROR: Portrait Filter Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
-goto end
+set "SERVICE_BAT=%TEMP%\run_portrait_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title Portrait Filter Module >> "%SERVICE_BAT%"
+echo cd /d %PORTRAIT_MODULE% >> "%SERVICE_BAT%"
+echo dotnet run >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo Portrait Filter Module has stopped. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+start cmd /k "%SERVICE_BAT%"
+goto keep_window_open
 
 :start_multimodellm
 echo.
 echo Starting MultiModeLLM Module...
-start cmd /k "title MultiModeLLM Module & cd /d %MULTIMODELLM_MODULE% && dotnet run || (echo. & echo ERROR: MultiModeLLM Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
-goto end
+set "SERVICE_BAT=%TEMP%\run_multimode_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title MultiModeLLM Module >> "%SERVICE_BAT%"
+echo cd /d %MULTIMODELLM_MODULE% >> "%SERVICE_BAT%"
+echo dotnet run >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo MultiModeLLM Module has stopped. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+start cmd /k "%SERVICE_BAT%"
+goto keep_window_open
 
 :start_all_hubs
 echo.
@@ -409,7 +442,7 @@ call :verify_and_start_service %REAASN_PORT% "ReaAaS-n Hub" "call conda.bat acti
 call :verify_and_start_service %HIPPOCAMPUS_PORT% "Hippocampus Hub" "call conda.bat activate SeCuReDmE_env && cd /d %HIPPOCAMPUS_DIR% && python db_manager.py"
 call :verify_and_start_service %CORPUS_CALLOSUM_PORT% "Corpus Callosum Hub" "call conda.bat activate SeCuReDmE_env && cd /d %CORPUS_CALLOSUM_DIR% && python quantum_ops.py"
 call :verify_and_start_service %PREFRONTAL_CORTEX_PORT% "Prefrontal Cortex Hub" "call conda.bat activate SeCuReDmE_env && cd /d %PREFRONTAL_CORTEX_DIR% && python ai_persona.py"
-goto end
+goto keep_window_open
 
 :start_all
 echo.
@@ -430,38 +463,70 @@ echo 4. Starting App MindsDB Server...
 call :verify_and_start_service %APP_MINDSDB_PORT% "App MindsDB Server" "call conda.bat activate SeCuReDmE_env && cd /d %APP_SERVER_DIR% && python mindsdb_server.py"
 
 echo 5. Starting SentimentAnalysis Module...
-start cmd /k "title Sentiment Analysis Module & cd /d %SENTIMENT_MODULE% && dotnet run || (echo. & echo ERROR: Sentiment Analysis Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
+set "SERVICE_BAT=%TEMP%\run_sentiment_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title Sentiment Analysis Module >> "%SERVICE_BAT%"
+echo cd /d %SENTIMENT_MODULE% >> "%SERVICE_BAT%"
+echo dotnet run >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo Sentiment Analysis Module has stopped. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+start cmd /k "%SERVICE_BAT%"
 timeout /t 3 >nul
 
 echo 6. Starting PortraitFilter Module...
-start cmd /k "title Portrait Filter Module & cd /d %PORTRAIT_MODULE% && dotnet run || (echo. & echo ERROR: Portrait Filter Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
+set "SERVICE_BAT=%TEMP%\run_portrait_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title Portrait Filter Module >> "%SERVICE_BAT%"
+echo cd /d %PORTRAIT_MODULE% >> "%SERVICE_BAT%"
+echo dotnet run >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo Portrait Filter Module has stopped. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+start cmd /k "%SERVICE_BAT%"
 timeout /t 3 >nul
 
 echo 7. Starting MultiModeLLM Module...
-start cmd /k "title MultiModeLLM Module & cd /d %MULTIMODELLM_MODULE% && dotnet run || (echo. & echo ERROR: MultiModeLLM Module failed to start & echo. & echo Press any key to close this window... & pause >nul)"
+set "SERVICE_BAT=%TEMP%\run_multimode_%RANDOM%.bat"
+echo @echo off > "%SERVICE_BAT%"
+echo title MultiModeLLM Module >> "%SERVICE_BAT%"
+echo cd /d %MULTIMODELLM_MODULE% >> "%SERVICE_BAT%"
+echo dotnet run >> "%SERVICE_BAT%"
+echo echo. >> "%SERVICE_BAT%"
+echo echo MultiModeLLM Module has stopped. >> "%SERVICE_BAT%"
+echo echo Press any key to close this window... >> "%SERVICE_BAT%"
+echo pause ^> nul >> "%SERVICE_BAT%"
+start cmd /k "%SERVICE_BAT%"
 
 echo.
 echo All components started successfully!
 echo.
-goto end
+goto keep_window_open
 
 :error_exit
 echo.
 echo An error occurred during integration startup.
-echo Press any key to exit...
-pause >nul
-exit /b 1
+goto keep_window_open
 
 :end
-echo.
-echo Press any key to exit the launcher...
-pause >nul
-exit /b 0
+echo Exiting the integration launcher...
+goto keep_window_open
 
-:: Added final pause to ensure window stays open even if errors occur
+:keep_window_open
 echo.
-echo Integration process completed. Check individual windows for any errors.
+echo ===============================================
+echo Integration process complete
+echo ===============================================
 echo.
-echo Press any key to exit...
-pause >nul
-exit /b 0
+echo This window will remain open so you can see any messages.
+echo Services are running in separate windows.
+echo.
+echo Press CTRL+C to close this window when you are ready.
+echo.
+
+:: Loop indefinitely to keep window open
+:loop_forever
+ping -n 2 127.0.0.1 >nul
+goto loop_forever
