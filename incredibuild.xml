@@ -8,7 +8,6 @@
     <MaxCoresLocal>4</MaxCoresLocal>
     <AvoidLocalExecution>false</AvoidLocalExecution>
     <CopyFilesToCoordinator>false</CopyFilesToCoordinator>
-    <CopyFilesFromCoordinator>false</CopyFilesFromCoordinator>
     <AvoidNetworkAccess>false</AvoidNetworkAccess>
     
     <!-- Agent specific settings -->
