@@ -1,75 +1,113 @@
-# Using IncrediBuild with CodeProject AI-MindsDB Project
+# IncrediBuild Integration for SeCuReDmE
 
-This document explains how to use IncrediBuild to accelerate builds for this project.
+This document describes how to use IncrediBuild with the SeCuReDmE project to accelerate build times by distributing build tasks across multiple cores or networked computers.
 
 ## Prerequisites
 
-1. Install IncrediBuild from [their official website](https://www.incredibuild.com/downloads)
-2. Make sure IncrediBuild is properly configured on your machine
+- IncrediBuild installed (version 10.0 or higher)
+- Windows operating system
+- .NET SDK installed
+- CodeProject AI Server solution files correctly set up
 
-## Using IncrediBuild
+## Configuration Files
 
-### Option 1: Using the provided script
+The IncrediBuild integration consists of two main files:
 
-Simply run:
+1. `build-with-incredibuild.bat` - The main script to configure agents and run the build
+2. `incredibuild.xml` - The XML configuration profile for IncrediBuild
 
-```bash
-npm run build:incredibuild
-```
+## Agent Configuration
 
-This will execute your build using IncrediBuild's distributed build capabilities.
+The script automatically configures the IncrediBuild agents with the following settings:
 
-### Option 2: Manual execution
+- **Memory Allocation**: 4GB per agent
+- **CPU Utilization**: 80% (allows system to remain responsive during builds)
+- **Idle Timeout**: 5 minutes (agents return to the pool after 5 minutes of inactivity)
+- **Network Scope**: Local network only (WAN agents are disabled)
 
-You can also run the build manually:
+These settings can be modified in the `build-with-incredibuild.bat` file under the "Configure Incredibuild agent settings" section.
 
-```bash
-BuildConsole.exe incredibuild.xml /profile="CodeProject AI-MindsDB Build" /command="npm install && npm run build"
-```
+## Using the Build Script
 
-## Configuration
+To use IncrediBuild for accelerated builds:
 
-The IncrediBuild configuration is stored in `incredibuild.xml`. You can modify this file to:
+1. Open a command prompt in the SeCuReDmE project directory
+2. Run: `.\mini-app-codeproject-ai-mindsdb\build-with-incredibuild.bat`
+3. Follow the on-screen prompts to select build options
 
-- Change the maximum number of cores used
-- Configure network settings
-- Adjust file synchronization options
-- Set environment variables
+### Available Build Options
 
-## Benefits of Using IncrediBuild
+The script provides several build options:
 
-- Faster builds through distributed compilation
-- Better resource utilization across your network
-- Build visualization and analytics
-- Seamless integration with existing build processes
+1. **Release build (x64)** - Standard release build for 64-bit systems
+2. **Debug build (x64)** - Debug build with symbols for 64-bit systems
+3. **Release build (Any CPU)** - Platform-independent release build
+4. **Debug build (Any CPU)** - Platform-independent debug build
+5. **Clean solution** - Clean all compiled files from the solution
+6. **Build specific module** - Build a single module (SentimentAnalysis, PortraitFilter, or MultiModeLLM)
+
+### Building Specific Modules
+
+When choosing to build a specific module (option 6), you can select from:
+
+1. SentimentAnalysis
+2. PortraitFilter
+3. MultiModeLLM
+4. All modules
+
+## XML Profile Configuration
+
+The `incredibuild.xml` file contains detailed settings for the build process:
+
+- **Core Allocation**: Automatically determines the optimal number of cores to use
+- **Local Cores**: Limits the number of local cores used to 4 (configurable)
+- **Parallel Build**: Enabled for maximum performance
+- **Multi-process Compilation**: Enabled to utilize multiple cores effectively
+- **Prediction**: Build prediction is enabled to anticipate and optimize build steps
+- **Visual Studio Integration**: Supports VS2019 and VS2022
+
+## Optimizing Performance
+
+For best performance with IncrediBuild:
+
+1. **Coordinator Machine**: The machine running the build script should be powerful and have good network connectivity
+2. **Network Throughput**: Ensure good network throughput between build agents
+3. **SSD Storage**: Using SSD storage for the build directories improves performance
+4. **Memory**: Allocate sufficient memory to agents (default is 4GB per agent)
+5. **Clean Builds**: Occasional clean builds help prevent incremental build issues
 
 ## Troubleshooting
 
-### Common Issues and Solutions
+If you encounter issues with IncrediBuild:
 
-#### 1. JSON Parse Error in package.json
+1. **Check Agent Status**: Run `ibconsole /command=getavailableagents` to verify agents are connected
+2. **Check Build Logs**: Examine the build logs in the root directory (`build-log.txt`)
+3. **Reset Agent Configuration**: Use the option at the end of the build script to reset agents to default settings
+4. **Update IncrediBuild**: Ensure you're using the latest version of IncrediBuild
+5. **Verify Project Files**: Run `fix_project_files.bat` to ensure all project files are correctly configured
 
-If you see an error like `npm error code EJSONPARSE`, it means your package.json file has invalid JSON format. Remember that package.json must contain valid JSON:
-- Comments like `// ...` are not allowed
-- All property names must be in double quotes
-- No trailing commas in arrays or objects
+## Advanced Configuration
 
-#### 2. Missing Project Files
-The build script automatically checks for and creates missing project files:
+Advanced users can modify the `incredibuild.xml` file directly to:
 
-- SentimentAnalysis.csproj
-- PortraitFilter.csproj
-- JsonAPI.csproj
+- Change memory allocation per agent
+- Adjust CPU utilization percentage
+- Modify build prediction settings
+- Add custom environment variables
+- Configure output verbosity levels
 
-If you encounter "Cannot open project file" errors, run the build script which will attempt to create these files with minimal valid content.
+## License Requirements
 
-#### 3. TargetFramework Issues
-If you see errors about unrecognized TargetFramework values, the build script will attempt to fix these by setting the appropriate target framework.
+IncrediBuild functionality depends on your license:
 
-### General Troubleshooting
-If you encounter other issues with IncrediBuild:
+- **Free Version**: Limited cores and build types
+- **Build Tools**: Full support for C++ and .NET builds
+- **Enterprise**: Full distribution of all build processes
 
-1. Check that IncrediBuild Agent is running
-2. Verify that your license is valid
-3. Examine the IncrediBuild logs for errors
-4. Contact IncrediBuild support for assistance
+Contact IncrediBuild sales for license options if you need additional capabilities.
+
+## For More Information
+
+- IncrediBuild Documentation: https://www.incredibuild.com/docs
+- CodeProject AI Documentation: https://www.codeproject.com/AI
+- SeCuReDmE Documentation: Refer to the project's main README files

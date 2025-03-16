@@ -2,14 +2,105 @@
 <BuildConsole>
   <Profile>
     <ProfileName>CodeProject AI-MindsDB Build</ProfileName>
+    <!-- Set to 0 for automatic core allocation -->
     <MaxCores>0</MaxCores>
-    <MaxCoresLocal>0</MaxCoresLocal>
+    <!-- Number of local cores to use (4 is a good default) -->
+    <MaxCoresLocal>4</MaxCoresLocal>
     <AvoidLocalExecution>false</AvoidLocalExecution>
     <CopyFilesToCoordinator>false</CopyFilesToCoordinator>
     <CopyFilesFromCoordinator>false</CopyFilesFromCoordinator>
     <AvoidNetworkAccess>false</AvoidNetworkAccess>
+    
+    <!-- Agent specific settings -->
+    <AgentSettings>
+      <!-- CPU utilization percentage (0-100) -->
+      <CPUUtilization>80</CPUUtilization>
+      <!-- Memory allocation in MB -->
+      <MemoryAllocation>4096</MemoryAllocation>
+      <!-- Allow agents to be used even while machine is not idle (helps in high-load scenarios) -->
+      <AllowNonIdleMode>true</AllowNonIdleMode>
+      <!-- Set priority for IncrediBuild jobs -->
+      <BuildPriority>Normal</BuildPriority>
+      <!-- Timeout settings in minutes -->
+      <IdleTimeout>5</IdleTimeout>
+      <BuildTimeout>120</BuildTimeout>
+    </AgentSettings>
+    
+    <!-- Build specific settings -->
+    <BuildSettings>
+      <!-- Use parallel compilation -->
+      <EnableParallelBuild>true</EnableParallelBuild>
+      <!-- Set multiprocess compilation -->
+      <MultiProcCompilation>true</MultiProcCompilation>
+      <!-- Maximum number of concurrent processes -->
+      <MaxProcNumber>16</MaxProcNumber>
+      <!-- Enable predictive execution -->
+      <EnablePrediction>true</EnablePrediction>
+      <!-- Path for temporary build files -->
+      <TempPath>%TEMP%\IncrediBuild_Temp</TempPath>
+      <!-- Enable file system monitoring (helps with incremental builds) -->
+      <EnableFSMonitoring>true</EnableFSMonitoring>
+    </BuildSettings>
+    
+    <!-- Visual Studio Integration -->
+    <VSIntegration>
+      <EnableVCIntegration>true</EnableVCIntegration>
+      <EnableCSIntegration>true</EnableCSIntegration>
+      <SupportedVersions>
+        <VS2019>true</VS2019>
+        <VS2022>true</VS2022>
+      </SupportedVersions>
+    </VSIntegration>
+    
+    <!-- Environment variables needed for build -->
     <Environment>
       <Variable Name="PATH" Value="%PATH%" />
+      <Variable Name="INCLUDE" Value="%INCLUDE%" />
+      <Variable Name="LIB" Value="%LIB%" />
+      <Variable Name="LIBPATH" Value="%LIBPATH%" />
+      <Variable Name="TEMP" Value="%TEMP%" />
+      <Variable Name="TMP" Value="%TMP%" />
+      <!-- Add custom environment variables for SeCuReDmE project -->
+      <Variable Name="SECUREDME_ROOT" Value="c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1" />
+      <Variable Name="PYTHONPATH" Value="%PYTHONPATH%;c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1" />
+      <Variable Name="DOTNET_CLI_HOME" Value="%USERPROFILE%" />
     </Environment>
+    
+    <!-- Output settings -->
+    <Output>
+      <!-- Enable detailed output for build logs -->
+      <VerbosityLevel>Normal</VerbosityLevel>
+      <!-- Show warnings -->
+      <ShowWarnings>true</ShowWarnings>
+      <!-- Show errors -->
+      <ShowErrors>true</ShowErrors>
+      <!-- Color output -->
+      <ColorOutput>true</ColorOutput>
+    </Output>
+    
+    <!-- Logging Settings -->
+    <Logging>
+      <!-- Enable build logging -->
+      <EnableLogging>true</EnableLogging>
+      <!-- Log file location (relative to build file location) -->
+      <LogFile>build-log.txt</LogFile>
+      <!-- Log verbosity -->
+      <LogVerbosity>Diagnostic</LogVerbosity>
+    </Logging>
+    
+    <!-- CodeProject AI Specific Settings -->
+    <CustomSettings>
+      <Setting Name="EnableGPU" Value="true" />
+      <Setting Name="EnableMultiModeLLM" Value="true" />
+      <Setting Name="EnableMindsDBIntegration" Value="true" />
+      <Setting Name="UsePythonConda" Value="true" />
+    </CustomSettings>
+    
+    <!-- License Information -->
+    <License>
+      <Type>Enterprise</Type>
+      <HeadNodes>1</HeadNodes>
+      <BuildAgents>Auto</BuildAgents>
+    </License>
   </Profile>
 </BuildConsole>
