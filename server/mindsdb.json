@@ -1,0 +1,40 @@
+{
+    "api": {
+        "http": {
+            "host": "127.0.0.1",
+            "port": "47334"
+        }
+    },
+    "storage_dir": "storage",
+    "integrations": {
+        "mongodb_atlas": {
+            "enabled": true,
+            "host": "atlas-sql-67784fb49d4ee405eb7f6fca-d33ve.a.query.mongodb.net",
+            "port": 27017,
+            "database": "mindsdb",
+            "user": "securedme_admin",
+            "password": "${MONGODB_ATLAS_PASSWORD}",
+            "type": "mongodb",
+            "federation": {
+                "enabled": true,
+                "sql_api": true,
+                "federated_database": "minds"
+            }
+        },
+        "codeproject_ai": {
+            "enabled": true,
+            "host": "127.0.0.1",
+            "port": 6000
+        }
+    },
+    "interface": {
+        "datastore": {
+            "enabled": true,
+            "storage_dir": "datastores"
+        },
+        "sqlalchemy": {
+            "enabled": true,
+            "dialect": "mongodb+srv"
+        }
+    }
+}
