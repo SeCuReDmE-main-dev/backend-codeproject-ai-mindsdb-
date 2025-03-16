@@ -11,6 +11,14 @@ setlocal EnableDelayedExpansion
 set "REQUIRED_PORTS=6000 6001 6002 47334 27017"
 set "PORT_IN_USE=0"
 
+:: Function to check if a port is in use
+:check_port
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":%1 .*LISTENING"') do (
+    echo Port %1 is in use by PID %%a
+    exit /b 1
+)
+exit /b 0
+
 :: Check all required ports first
 echo Checking required ports...
 for %%p in (%REQUIRED_PORTS%) do (
@@ -114,24 +122,6 @@ echo - MongoDB is connected to %MONGODB_URI%
 echo.
 echo Press Ctrl+C in each terminal window to stop the services.
 exit /b 0
-
-:check_port
-:: Usage: call :check_port port_number
-set "port=%~1"
-set "temp_file=%temp%\port_check_%random%.txt"
-netstat -an | findstr /R /C:":%port% .*LISTENING" > "%temp_file%"
-for /f "tokens=5" %%a in ('type "%temp_file%"') do set "pid=%%a"
-del "%temp_file%" 2>nul
-if defined pid (
-    for /f "tokens=1,2" %%a in ('tasklist /fi "PID eq !pid!" ^| findstr /i "!pid!"') do (
-        set "process_name=%%a"
-    )
-    echo Port %port% is in use by !process_name! (PID: !pid!)
-    exit /b 1
-) else (
-    echo Port %port% is available.
-    exit /b 0
-)
 
 :free_port
 :: Usage: call :free_port port_number
