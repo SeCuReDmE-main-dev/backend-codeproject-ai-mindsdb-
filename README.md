@@ -22,7 +22,6 @@ This project is a mini app built using the duo server side CodeProject AI server
 2. Navigate to the `server` directory:
 
    ```bash
-   ```bash
    cd server
    ```
 
@@ -57,6 +56,8 @@ This project is a mini app built using the duo server side CodeProject AI server
    ```bash
    python mindsdb_server.py
    ```
+
+   Note: MindsDB server should be configured to use port 5001 instead of the default 47337.
 
 ### Setting up the Shared Central Database
 
@@ -112,6 +113,28 @@ This project is a mini app built using the duo server side CodeProject AI server
 4. Open `index.html` in a web browser to access the client-side interface.
 
 5. Use the client-side interface to interact with the mini app, which will communicate with the backend servers and the shared central database.
+
+## Troubleshooting
+
+### Python Installation Issues
+If you encounter Python installation issues in MSYS2 or similar environments, consider:
+
+1. Using a virtual environment:
+   ```bash
+   python -m venv path/to/venv
+   path/to/venv/bin/pip install -r requirements.txt
+   ```
+
+2. Using `pipx` for application installations:
+   ```bash
+   pacman -S $MINGW_PACKAGE_PREFIX-python-pipx
+   pipx install package_name
+   ```
+
+### MindsDB Connection Issues
+- If you encounter "No connection could be made" errors with port 47337, make sure MindsDB is properly configured to use port 5001 as specified in the server configuration.
+- Verify that all services are running before attempting connections.
+- Check for any firewall rules that might be blocking the required ports.
 
 ## Contributing Guidelines
 
