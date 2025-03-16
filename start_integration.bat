@@ -530,3 +530,43 @@ echo.
 :loop_forever
 ping -n 2 127.0.0.1 >nul
 goto loop_forever
+
+@echo off
+echo ===============================================
+echo Starting CodeProject.AI - MindsDB Integration
+echo ===============================================
+
+:: Set paths
+set "ROOT_DIR=%~dp0"
+set "SERVER_DIR=%ROOT_DIR%server"
+set "NEURAL_DIR=%ROOT_DIR%neural_forecast"
+
+:: Initialize neural environment
+echo Initializing neural environment...
+cd /d "%NEURAL_DIR%"
+call init_neural_env.bat
+if %ERRORLEVEL% neq 0 (
+    echo Failed to initialize neural environment
+    pause
+    exit /b 1
+)
+
+:: Start MindsDB server
+echo Starting MindsDB server...
+cd /d "%SERVER_DIR%"
+start "MindsDB Server" cmd /c "python mindsdb_server.py"
+
+:: Wait for MindsDB to start
+timeout /t 5 /nobreak
+
+:: Start Flask API server
+echo Starting Flask API server...
+start "Flask Server" cmd /c "python -m flask run --port=5000"
+
+echo.
+echo Integration services started:
+echo - MindsDB Server: http://localhost:47334
+echo - Flask API: http://localhost:5000
+echo.
+echo Press Ctrl+C in respective windows to stop services.
+exit /b 0
