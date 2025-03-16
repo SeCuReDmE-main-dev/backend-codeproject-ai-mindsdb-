@@ -61,22 +61,22 @@ set "EBAAZ_DIR=%MICROSERVICES_DIR%\ebaaz_hub"
 set "NEUURO_DIR=%MICROSERVICES_DIR%\neuuro_hub"
 set "REAASN_DIR=%MICROSERVICES_DIR%\reaasn_hub"
 
-:: Core Services (5000-5009)
-set "CODEPROJECT_PORT=5000"
-set "APP_CODEPROJECT_PORT=5001"
-set "APP_MINDSDB_PORT=5002"
+:: Core Services (6000-6009) - Moved from 5000 range to avoid conflicts
+set "CODEPROJECT_PORT=6000"
+set "APP_CODEPROJECT_PORT=6001"
+set "APP_MINDSDB_PORT=6002"
 
-:: Hub Services (5010-5019)
-set "CELEBRUM_PORT=5010"
-set "SENNTI_PORT=5011"
-set "EBAAZ_PORT=5012"
-set "NEUURO_PORT=5013"
-set "REAASN_PORT=5014"
-set "HIPPOCAMPUS_PORT=5015"
-set "CORPUS_CALLOSUM_PORT=5016"
-set "PREFRONTAL_CORTEX_PORT=5017"
+:: Hub Services (6010-6019) - Moved from 5010 range to avoid conflicts
+set "CELEBRUM_PORT=6010"
+set "SENNTI_PORT=6011"
+set "EBAAZ_PORT=6012"
+set "NEUURO_PORT=6013"
+set "REAASN_PORT=6014"
+set "HIPPOCAMPUS_PORT=6015"
+set "CORPUS_CALLOSUM_PORT=6016"
+set "PREFRONTAL_CORTEX_PORT=6017"
 
-:: MindsDB Services (47330-47339)
+:: MindsDB Services (47330-47339) - No conflicts, can stay the same
 set "MINDSDB_PORT=47334"
 
 :: Verify directories exist
