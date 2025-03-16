@@ -115,8 +115,11 @@ set "HIPPOCAMPUS_PORT=6015"
 set "CORPUS_CALLOSUM_PORT=6016"
 set "PREFRONTAL_CORTEX_PORT=6017"
 
-:: MindsDB Services (47330-47339) - No conflicts, can stay the same
-set "MINDSDB_PORT=47334"
+:: Database Services (Use existing instances)
+set "REDIS_PORT=6379"      :: Using existing Redis instance
+set "MONGODB_PORT=27017"   :: Using existing MongoDB instance
+set "MINDSDB_PORT=47334"   :: MindsDB port
+set "RABBITMQ_PORT=5673"   :: Changed from 5672 to avoid conflict with existing RabbitMQ
 
 :: Verify directories exist
 echo Checking required directories...
