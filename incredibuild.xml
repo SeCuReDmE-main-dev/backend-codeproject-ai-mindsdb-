@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <BuildConsole>
   <Profile>
-    <ProfileName>SeCuReDmE CodeProject.AI Build</ProfileName>
+    <ProfileName>SeCuReDmE EduForecast Build</ProfileName>
     <!-- Set to 0 for automatic core allocation -->
     <MaxCores>0</MaxCores>
     <!-- Number of local cores to use (4 is a good default) -->
@@ -24,6 +24,10 @@
       <!-- Timeout settings in minutes -->
       <IdleTimeout>5</IdleTimeout>
       <BuildTimeout>120</BuildTimeout>
+      <!-- Neural forecast specific settings -->
+      <GPUUtilization>90</GPUUtilization>
+      <TensorFlowOptimization>true</TensorFlowOptimization>
+      <PythonMultiprocessing>true</PythonMultiprocessing>
     </AgentSettings>
     
     <!-- Build specific settings -->
@@ -40,6 +44,10 @@
       <TempPath>%TEMP%\IncrediBuild_Temp</TempPath>
       <!-- Enable file system monitoring (helps with incremental builds) -->
       <EnableFSMonitoring>true</EnableFSMonitoring>
+      <!-- Neural training optimizations -->
+      <EnableNeuralCaching>true</EnableNeuralCaching>
+      <BatchProcessing>true</BatchProcessing>
+      <DataParallelism>true</DataParallelism>
     </BuildSettings>
     
     <!-- Visual Studio Integration -->
@@ -51,6 +59,25 @@
         <VS2022>true</VS2022>
       </SupportedVersions>
     </VSIntegration>
+    
+    <!-- Python/Neural Integration -->
+    <PythonIntegration>
+      <EnablePythonAcceleration>true</EnablePythonAcceleration>
+      <PythonVersion>3.9</PythonVersion>
+      <VirtualEnvSupport>true</VirtualEnvSupport>
+      <CondaSupport>true</CondaSupport>
+      <Environment>SeCuReDmE_env</Environment>
+      <PackageOptimization>true</PackageOptimization>
+    </PythonIntegration>
+    
+    <!-- MindsDB Integration -->
+    <MindsDBIntegration>
+      <EnableMindsDBAcceleration>true</EnableMindsDBAcceleration>
+      <Port>47334</Port>
+      <ModelCaching>true</ModelCaching>
+      <ParallelPredictions>true</ParallelPredictions>
+      <BatchPredictions>true</BatchPredictions>
+    </MindsDBIntegration>
     
     <!-- Supported platforms - Updated to match available configurations -->
     <Platforms>
@@ -77,6 +104,8 @@
       <Variable Name="SECUREDME_ROOT" Value="c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1" />
       <Variable Name="PYTHONPATH" Value="%PYTHONPATH%;c:\Users\jeans\OneDrive\Desktop\SeCuReDmE final\SeCuReDmE-1" />
       <Variable Name="DOTNET_CLI_HOME" Value="%USERPROFILE%" />
+      <Variable Name="CONDA_PREFIX" Value="%CONDA_PREFIX%" />
+      <Variable Name="MINDSDB_CONFIG_PATH" Value="MindsDB" />
     </Environment>
     
     <!-- Output settings -->
@@ -89,6 +118,7 @@
       <ShowErrors>true</ShowErrors>
       <!-- Color output -->
       <ColorOutput>true</ColorOutput>
+      <DetailedTiming>true</DetailedTiming>
     </OutputSettings>
     
     <!-- Logging Settings -->
@@ -99,6 +129,8 @@
       <LogFile>build-log.txt</LogFile>
       <!-- Log verbosity -->
       <LogVerbosity>Diagnostic</LogVerbosity>
+      <PerformanceLog>true</PerformanceLog>
+      <NeuralTrainingLog>true</NeuralTrainingLog>
     </Logging>
     
     <!-- CodeProject AI Specific Settings -->
@@ -109,11 +141,22 @@
       <Setting Name="UsePythonConda" Value="true" />
     </CustomSettings>
     
+    <!-- Neural Forecast Settings -->
+    <NeuralSettings>
+      <EnableGPU>true</EnableGPU>
+      <BatchSize>32</BatchSize>
+      <ParallelTraining>true</ParallelTraining>
+      <CheckpointInterval>100</CheckpointInterval>
+      <AutoTuning>true</AutoTuning>
+      <DistributedTraining>true</DistributedTraining>
+    </NeuralSettings>
+    
     <!-- License Information -->
     <License>
       <Type>Enterprise</Type>
       <HeadNodes>1</HeadNodes>
       <BuildAgents>Auto</BuildAgents>
+      <EnableNeuralFeatures>true</EnableNeuralFeatures>
     </License>
   </Profile>
 </BuildConsole>
