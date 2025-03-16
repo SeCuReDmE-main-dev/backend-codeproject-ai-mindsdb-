@@ -24,7 +24,22 @@ MONGODB_CONFIG = {
 MINDSDB_CONFIG = {
     'host': '127.0.0.1',
     'port': 47336,
-    'database': 'mindsdb'
+    'database': 'mindsdb',
+    'api': {
+        'mongo': {
+            'path': 'C:/Users/jeans/OneDrive/Desktop/SeCuReDmE final/SeCuReDmE-1/mini-app-codeproject-ai-mindsdb/MindsDB/mindsdb/api/mongo',
+            'port': 47337,
+            'host': '127.0.0.1'
+        },
+        'postgres': {
+            'path': 'C:/Users/jeans/OneDrive/Desktop/SeCuReDmE final/SeCuReDmE-1/mini-app-codeproject-ai-mindsdb/MindsDB/mindsdb/api/postgres/postgres_proxy',
+            'port': 47335,
+            'host': '127.0.0.1',
+            'user': 'postgres',
+            'password': 'your_password',
+            'database': 'mindsdb'
+        }
+    }
 }
 
 @contextmanager
@@ -72,14 +87,59 @@ def create_mongodb_connection():
         if client is not None:
             client.close()
 
+def initialize_mindsdb_apis():
+    """Initialize MindsDB API paths and configurations"""
+    try:
+        # Set environment variables for API paths
+        os.environ['MINDSDB_MONGO_API_PATH'] = MINDSDB_CONFIG['api']['mongo']['path']
+        os.environ['MINDSDB_POSTGRES_API_PATH'] = MINDSDB_CONFIG['api']['postgres']['path']
+        
+        # Create MongoDB proxy configuration
+        mongo_config = {
+            'host': MINDSDB_CONFIG['api']['mongo']['host'],
+            'port': MINDSDB_CONFIG['api']['mongo']['port'],
+            'api_path': MINDSDB_CONFIG['api']['mongo']['path']
+        }
+        
+        # Create PostgreSQL proxy configuration
+        postgres_config = {
+            'host': MINDSDB_CONFIG['api']['postgres']['host'],
+            'port': MINDSDB_CONFIG['api']['postgres']['port'],
+            'user': MINDSDB_CONFIG['api']['postgres']['user'],
+            'password': MINDSDB_CONFIG['api']['postgres']['password'],
+            'database': MINDSDB_CONFIG['api']['postgres']['database'],
+            'api_path': MINDSDB_CONFIG['api']['postgres']['path']
+        }
+        
+        # Save proxy configurations
+        config_dir = os.path.dirname(MINDSDB_CONFIG['api']['mongo']['path'])
+        
+        with open(os.path.join(config_dir, 'mongo_config.json'), 'w') as f:
+            json.dump(mongo_config, f, indent=4)
+            
+        with open(os.path.join(config_dir, 'postgres_config.json'), 'w') as f:
+            json.dump(postgres_config, f, indent=4)
+            
+        print("MindsDB API configurations initialized successfully")
+        return True
+    except Exception as e:
+        print(f"Error initializing MindsDB APIs: {e}")
+        return False
+
 @contextmanager
 def create_mindsdb_connection():
     client = None
     try:
-        client = MongoClient(f"mongodb://{MINDSDB_CONFIG['host']}:{MINDSDB_CONFIG['port']}/")
-        db = client[MINDSDB_CONFIG['database']]
-        print(f"Connected to MindsDB")
-        yield db
+        # Initialize MindsDB APIs before connection
+        if initialize_mindsdb_apis():
+            mongo_port = MINDSDB_CONFIG['api']['mongo']['port']
+            client = MongoClient(f"mongodb://{MINDSDB_CONFIG['host']}:{mongo_port}/")
+            db = client[MINDSDB_CONFIG['database']]
+            print(f"Connected to MindsDB through MongoDB API on port {mongo_port}")
+            yield db
+        else:
+            print("Failed to initialize MindsDB APIs")
+            yield None
     except Exception as e:
         print(f"Error connecting to MindsDB: {e}")
         yield None
@@ -243,10 +303,13 @@ def main():
         if mongo_db is not None:
             create_mongodb_collections(mongo_db)
 
-    # Test MindsDB connection
+    # Initialize MindsDB APIs and test connection
+    print("\nInitializing MindsDB APIs...")
     with create_mindsdb_connection() as mindsdb:
         if mindsdb is not None:
             print("Successfully connected to MindsDB")
+            print(f"MongoDB API path: {MINDSDB_CONFIG['api']['mongo']['path']}")
+            print(f"PostgreSQL API path: {MINDSDB_CONFIG['api']['postgres']['path']}")
 
 def insert_sample_data(database):
     with create_sqlite_connection(database) as conn:
