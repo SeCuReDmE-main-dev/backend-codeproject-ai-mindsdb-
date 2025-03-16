@@ -16,6 +16,7 @@ IncrediBuild is used to accelerate:
 ### Build Settings
 
 The `incredibuild.xml` file configures:
+
 - CPU/GPU utilization
 - Memory allocation
 - Build parallelization
@@ -25,6 +26,7 @@ The `incredibuild.xml` file configures:
 ### Module-Specific Settings
 
 Each neural module can be optimized with:
+
 - Batch processing
 - Data parallelism
 - Model caching
@@ -120,6 +122,7 @@ npm run build:incredibuild
 ## Tool Integration
 
 ### Supported Tools
+
 - Visual Studio
 - MSBuild
 - Python
@@ -127,6 +130,7 @@ npm run build:incredibuild
 - CUDA toolkit
 
 ### Build Coordination
+
 - Automatic dependency detection
 - Parallel execution
 - Resource optimization

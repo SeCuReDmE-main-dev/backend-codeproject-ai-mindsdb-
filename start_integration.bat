@@ -10,14 +10,19 @@ setlocal EnableDelayedExpansion
 :: Make sure this window stays open even if errors occur
 set "KEEP_WINDOW_OPEN=1"
 
-:: Check for IncrediBuild
+:: Check for IncrediBuild installation
+echo ===============================================
+echo IncrediBuild Agent Information
+echo ===============================================
 set "INCREDIBUILD_PATH=C:\Program Files (x86)\IncrediBuild\IncrediBuild.exe"
+set "USE_INCREDIBUILD=0"
+
 if exist "%INCREDIBUILD_PATH%" (
+    set "USE_INCREDIBUILD=1"
     echo IncrediBuild found at: %INCREDIBUILD_PATH%
 ) else (
     echo WARNING: IncrediBuild not found at %INCREDIBUILD_PATH%
     echo The integration will continue without IncrediBuild acceleration.
-    echo If you need IncrediBuild, please install it or update its path in this script.
     echo.
 )
 
