@@ -5,6 +5,7 @@ This guide covers the IncrediBuild integration with SeCuReDmE's neural modules a
 ## Overview
 
 IncrediBuild is used to accelerate:
+
 - Neural model training
 - Multi-module compilation
 - Distributed predictions
