@@ -105,6 +105,13 @@ def delete_model(model_id):
     db.session.commit()
     return jsonify({'message': 'Model deleted successfully'})
 
+@app.route('/models/<int:model_id>/predictions', methods=['GET'])
+@handle_errors
+def get_predictions(model_id):
+    model = AIModel.query.get_or_404(model_id)
+    predictions = Prediction.query.filter_by(model_id=model.id).all()
+    return jsonify([prediction.to_dict() for prediction in predictions])
+
 if __name__ == '__main__':
     with app.app_context():
         if not os.path.exists('shared_central_database.db'):

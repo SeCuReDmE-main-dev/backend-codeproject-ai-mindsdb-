@@ -91,6 +91,34 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
+:: Create NewAIModel directory and project file
+echo Creating NewAIModel directory and project...
+if not exist "%MODULE_DIR%\CodeProject.AI-NewAIModel" (
+    mkdir "%MODULE_DIR%\CodeProject.AI-NewAIModel" 2>nul
+    if %ERRORLEVEL% neq 0 (
+        echo Failed to create NewAIModel directory. Please check permissions.
+        pause > nul
+        exit /b 1
+    )
+)
+
+echo Creating NewAIModel project file...
+(
+    echo ^<Project Sdk="Microsoft.NET.Sdk"^>
+    echo   ^<PropertyGroup^>
+    echo     ^<TargetFramework^>net6.0^</TargetFramework^>
+    echo     ^<OutputType^>Exe^</OutputType^>
+    echo     ^<ImplicitUsings^>enable^</ImplicitUsings^>
+    echo     ^<Nullable^>enable^</Nullable^>
+    echo   ^</PropertyGroup^>
+    echo ^</Project^>
+) > "%MODULE_DIR%\CodeProject.AI-NewAIModel\NewAIModel.csproj" 2>nul
+if %ERRORLEVEL% neq 0 (
+    echo Failed to create NewAIModel project file. Please check permissions.
+    pause > nul
+    exit /b 1
+)
+
 :: Fix the JsonAPI.csproj file
 set "JSONAPI_PATH=%BASE_DIR%\CodeProject.AI-Server\src\demos\clients\Net\JsonAPI"
 echo Checking JsonAPI path: %JSONAPI_PATH%
