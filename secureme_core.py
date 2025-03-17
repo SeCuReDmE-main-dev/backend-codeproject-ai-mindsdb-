@@ -177,7 +177,7 @@ class SeCuReDmECore:
 
         # Start the new AI model
         if "new_ai_model" in self.config["models"]:
-            self._start_module("new_ai_model")
+            self._start_model("new_ai_model")
             logger.info("New AI model started")
 
     def register_module(self, module_name, module_path, description="", dependencies=None):
