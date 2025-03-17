@@ -104,9 +104,10 @@ echo 6. Debug build (ARM64)
 echo 7. Clean solution
 echo 8. Build specific module
 echo 9. Build Python MindsDB integration
+echo 10. Build new AI model
 echo.
 
-choice /C 123456789 /N /M "Select a build option [1-9]: "
+choice /C 1234567890 /N /M "Select a build option [1-10]: "
 
 set BUILD_CONFIG=Release
 if %ERRORLEVEL% EQU 1 set "BUILD_CONFIG=Release|Any CPU"
@@ -121,6 +122,7 @@ if %ERRORLEVEL% EQU 7 (
 )
 if %ERRORLEVEL% EQU 8 goto build_module
 if %ERRORLEVEL% EQU 9 goto build_mindsdb
+if %ERRORLEVEL% EQU 10 goto build_new_ai_model
 
 :: Build the solution - Fixed BuildConsole command format
 echo Building solution with configuration: %BUILD_CONFIG%
@@ -267,6 +269,34 @@ timeout /t 2 /nobreak >nul
 :: Now run start_integration
 cd /d "%ROOT_DIR%\mini-app-codeproject-ai-mindsdb"
 call start_integration.bat
+goto keep_window_open
+
+:build_new_ai_model
+echo.
+echo Building new AI model...
+
+:: Check if new AI model directory exists
+set "NEW_AI_MODEL_DIR=%MODULES_DIR%\CodeProject.AI-NewAIModel"
+if not exist "%NEW_AI_MODEL_DIR%" (
+    echo Creating new AI model directory: %NEW_AI_MODEL_DIR%...
+    mkdir "%NEW_AI_MODEL_DIR%" 2>nul
+)
+
+:: Create basic project files if they don't exist
+set "NEW_AI_MODEL_PROJECT_FILE=%NEW_AI_MODEL_DIR%\NewAIModel.csproj"
+if not exist "%NEW_AI_MODEL_PROJECT_FILE%" (
+    echo Creating basic project file for NewAIModel...
+    echo ^<?xml version="1.0" encoding="utf-8"?^>> "%NEW_AI_MODEL_PROJECT_FILE%"
+    echo ^<Project Sdk="Microsoft.NET.Sdk"^>>> "%NEW_AI_MODEL_PROJECT_FILE%"
+    echo   ^<PropertyGroup^>>> "%NEW_AI_MODEL_PROJECT_FILE%"
+    echo     ^<TargetFramework^>net7.0^</TargetFramework^>>> "%NEW_AI_MODEL_PROJECT_FILE%"
+    echo   ^</PropertyGroup^>>> "%NEW_AI_MODEL_PROJECT_FILE%"
+    echo ^</Project^>>> "%NEW_AI_MODEL_PROJECT_FILE%"
+)
+
+echo Building new AI model...
+BuildConsole "%NEW_AI_MODEL_PROJECT_FILE%" /cfg="Release|Any CPU" /ShowTime /ShowAgent
+
 goto keep_window_open
 
 :keep_window_open

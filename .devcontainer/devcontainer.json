@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    "test": "python -c \"from test_app import test_database; print(test_database())\" && python -c \"from test_app import test_codeproject_ai; print(test_codeproject_ai())\" && python -c \"from test_app import test_mindsdb; print(test_mindsdb())\"",
+    "build": "pip install -r custom_requirements.txt",
+    "launch": "cd CodeProject.AI-Server && start.bat || ./start.sh"
+  }
+}

@@ -27,6 +27,12 @@
       "description": "Image processing and facial detection",
       "path": "CodeProject.AI-Modules/CodeProject.AI-PortraitFilter",
       "dependencies": ["codeproject_ai"]
+    },
+    "NewCustomModule": {
+      "enabled": true,
+      "description": "A new custom module for AI processing",
+      "path": "CodeProject.AI-Server/modules/NewCustomModule",
+      "dependencies": ["codeproject_ai"]
     }
   },
   "models": {
@@ -34,6 +40,11 @@
       "type": "mindsdb",
       "description": "Sentiment analysis model",
       "setup_query": "CREATE MODEL sentiment_model PREDICT sentiment USING ENGINE = 'openai', PREDICT_PARAMS = {\"model_name\": \"gpt-3.5-turbo\"}"
+    },
+    "new_ai_model": {
+      "type": "mindsdb",
+      "description": "A new AI model for predictions",
+      "setup_query": "CREATE MODEL new_ai_model PREDICT prediction USING ENGINE = 'openai', PREDICT_PARAMS = {\"model_name\": \"gpt-3.5-turbo\"}"
     }
   },
   "security": {

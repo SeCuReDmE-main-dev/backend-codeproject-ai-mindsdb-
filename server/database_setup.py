@@ -8,13 +8,17 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Database Configuration
 POSTGRESQL_CONFIG = {
     'host': 'localhost',
-    'database': 'postgreSQL',  # Updated to match Compass config
+    'database': 'Neural_Network',  # Updated to match Compass config
     'user': 'postgres',
-    'password': 'your_password',
+    'password': os.getenv('POSTGRES_PASSWORD'),
     'port': '5432'
 }
 
