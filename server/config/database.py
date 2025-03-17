@@ -1,4 +1,9 @@
 """Database configuration settings"""
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # PostgreSQL Configuration
 POSTGRESQL_CONFIG = {
@@ -6,7 +11,7 @@ POSTGRESQL_CONFIG = {
     'port': 5432,
     'database': 'Neural_Network',
     'user': 'jean-sebastien',
-    'password': ''  # Add your password here
+    'password': os.getenv('POSTGRES_PASSWORD', '')  # Get password from environment variable
 }
 
 # MongoDB Configuration
