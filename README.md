@@ -1,169 +1,116 @@
-# Mini App with CodeProject AI Server and MindsDB
+# CodeProject.AI and MindsDB Integration
 
-## Description
+This directory contains the integration between CodeProject.AI Server and MindsDB, creating a powerful AI processing pipeline with advanced machine learning capabilities.
 
-This project is a mini app built using the duo server side CodeProject AI server and MindsDB. The app intertwines the capabilities of both tools through their REST APIs to ensure constant communication between the backend and frontend. The app also utilizes persistent outside storage to hold databases categorized by coding language: Python, JavaScript, and other languages like Make/Go, bakefiles, .yml, .yaml.
+## Directory Structure
 
-## Installation Instructions
+- **CodeProject.AI-Server/**: The main CodeProject.AI Server implementation
+- **CodeProject.AI-Modules/**: Various AI processing modules
+- **server/**: Custom server components for the integration, including database setup
+
+## Setup Instructions
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- Flask
+- Python 3.10 or later
+- PostgreSQL database
+- .NET Runtime for CodeProject.AI Server
 
-### Setting up the CodeProject AI Server
+### Database Setup
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/your-username/mini-app-codeproject-ai-mindsdb.git
+1. Install required Python packages:
+   ```
+   pip install sqlalchemy psycopg2-binary
    ```
 
-2. Navigate to the `server` directory:
+2. Configure the PostgreSQL database:
+   - Server: localhost
+   - Database name: Neural_Network
+   - Port: 5432
+   - Username: [your_username]
 
-   ```bash
-   cd server
+3. Run the database setup script:
+   ```
+   python server/database_setup.py
+   ```
+   This will create the necessary tables including the `ai_models` table.
+
+### Starting the Server
+
+1. Navigate to the CodeProject.AI Server directory:
+   ```
+   cd CodeProject.AI-Server
    ```
 
-3. Install the required dependencies:
+2. Start the server:
+   - On Windows: `start.bat`
+   - On Linux/macOS: `./start.sh`
 
-   ```bash
-   pip install -r requirements.txt
+## Using Custom Modules
+
+### Available Custom Modules
+
+- **EbaAaZ_module**: Custom AI processing module
+- **CeLeBrUm_module**: Neural network processing module
+- **SenNnT-i_module**: Specialized AI module
+- **NeuUuR-o**: TensorZero middleware (under development)
+
+### Accessing Module APIs
+
+1. EbaAaZ Module:
+   - Endpoint: `http://localhost:32168/custom/ebaaz-process`
+   - Method: POST
+   - Request body:
+     ```json
+     {
+       "input_data": "Your input data here"
+     }
+     ```
+
+2. CeLeBrUm Module:
+   - Endpoint: `http://localhost:32168/neural/cerebrum-process`
+   - Method: POST
+   - Request body:
+     ```json
+     {
+       "input_data": "Your input data here",
+       "parameters": "{\"param_name\": \"param_value\"}"
+     }
+     ```
+
+## Mesh Network
+
+The CodeProject.AI Server mesh network allows modules to communicate with each other and distribute the workload across multiple servers. The custom modules are configured to participate in the mesh network.
+
+To enable a module for mesh networking:
+- Ensure the `MeshEnabled` property is set to `true` in the module's `modulesettings.json` file
+- Use the appropriate endpoints to communicate with the modules
+
+## Testing
+
+To verify that the integration is working correctly:
+
+1. Check the database connection:
+   ```python
+   python -c "from test_app import test_database; print(test_database())"
    ```
 
-4. Run the CodeProject AI server:
-
-   ```bash
-   python codeproject_ai_server.py
+2. Test the CodeProject.AI Server:
+   ```python
+   python -c "from test_app import test_codeproject_ai; print(test_codeproject_ai())"
    ```
 
-### Setting up the MindsDB Server
-
-1. Navigate to the `server` directory:
-
-   ```bash
-   cd server
+3. Test the MindsDB connection:
+   ```python
+   python -c "from test_app import test_mindsdb; print(test_mindsdb())"
    ```
-
-2. Install the required dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run the MindsDB server:
-
-   ```bash
-   python mindsdb_server.py
-   ```
-
-   Note: MindsDB server should be configured to use port 5001 instead of the default 47337.
-
-### Setting up the Shared Central Database
-
-1. Navigate to the `server` directory:
-
-   ```bash
-   cd server
-   ```
-
-2. Run the database setup script:
-
-   ```bash
-   python database_setup.py
-   ```
-
-   This script will create the necessary database tables including `ai_models` which is required for the application.
-
-### Setting up a Conda Environment
-
-1. Create a conda environment:
-
-   ```bash
-   conda create --name myenv python=3.8
-   ```
-
-2. Activate the conda environment:
-
-   ```bash
-   conda activate myenv
-   ```
-
-3. Install the required dependencies using `pip` within the conda environment:
-
-   ```bash
-   pip install -r server/requirements.txt
-   pip install -r client/requirements.txt
-   ```
-
-## Usage Instructions
-
-1. Start the CodeProject AI server and MindsDB server as described in the installation instructions.
-
-2. Navigate to the `client` directory:
-
-   ```bash
-   cd client
-   ```
-
-3. Install the required dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Open `index.html` in a web browser to access the client-side interface.
-
-5. Use the client-side interface to interact with the mini app, which will communicate with the backend servers and the shared central database.
 
 ## Troubleshooting
 
-### Python Installation Issues
-If you encounter Python installation issues in MSYS2 or similar environments, consider:
+- If you encounter a "no such table: ai_models" error, run the database setup script to create the missing table.
+- For connection issues, check that the server is running and accessible at the expected address and port.
+- For module-related issues, verify that the module's adapter script is correctly configured and the required dependencies are installed.
 
-1. Using a virtual environment:
-   ```bash
-   python -m venv path/to/venv
-   path/to/venv/bin/pip install -r requirements.txt
-   ```
+## License
 
-2. Using `pipx` for application installations:
-   ```bash
-   pacman -S $MINGW_PACKAGE_PREFIX-python-pipx
-   pipx install package_name
-   ```
-
-### MindsDB Connection Issues
-- If you encounter "No connection could be made" errors with port 47337, make sure MindsDB is properly configured to use port 5001 as specified in the server configuration.
-- Verify that all services are running before attempting connections.
-- Check for any firewall rules that might be blocking the required ports.
-
-### Database Issues
-- If you encounter errors like `no such table: ai_models`, run the database setup script:
-  ```bash
-  python server/database_setup.py
-  ```
-- Make sure you have write permissions to the database directory.
-- If the error persists, try removing the existing database file and running the setup script again:
-  ```bash
-  rm server/database/app.db
-  python server/database_setup.py
-  ```
-
-## Contributing Guidelines
-
-We welcome contributions to this project. To contribute, please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch for your feature or bugfix.
-3. Make your changes and commit them with a clear message.
-4. Push your changes to your fork.
-5. Create a pull request to the main repository.
-
-## License Information
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
-## Contact Information
-
-For any questions or inquiries, please contact us at [email@example.com].
+This integration is licensed under the MIT License.
